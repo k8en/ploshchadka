@@ -203,7 +203,6 @@ public class TrainingScreen extends AbstractScreen {
         }
 
         if (KeyEvent.VK_D == e.getKeyCode()) {
-            System.out.println("VK_D");
             // Move right
             if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())
                     || Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
@@ -212,7 +211,6 @@ public class TrainingScreen extends AbstractScreen {
 
             }
         } else if (KeyEvent.VK_A == e.getKeyCode()) {
-            System.out.println("VK_A");
             // Move Left
             if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())
                     || Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {

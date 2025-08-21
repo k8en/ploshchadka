@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class Player {
 
-    private Map<String, Animation> animationMap;
+    private final Map<String, Animation> animationMap;
     private Animation currentAnimation;
 
     public Player() {
@@ -21,8 +21,8 @@ public class Player {
 
         BufferedImage imageFrame01 = FileUtils.loadImage("frame01.png");
         BufferedImage imageFrame02 = FileUtils.loadImage("frame02.png");
-        BufferedImage imageFrame01m = FileUtils.getImageMirroredHorizontally(imageFrame01);
-        BufferedImage imageFrame02m = FileUtils.getImageMirroredHorizontally(imageFrame02);
+        BufferedImage imageFrame01m = FileUtils.loadImage("frame01m.png");
+        BufferedImage imageFrame02m = FileUtils.loadImage("frame02m.png");
 
         AnimationFrame[] standRightFrames = new AnimationFrame[1];
         standRightFrames[0] = new AnimationFrame(0, imageFrame01, 999);
@@ -82,7 +82,5 @@ public class Player {
                 onScreenX, onScreenY,
                 null
         );
-
-        Console.addMessage("Frame image: " + frameImage.getWidth() + "x" + frameImage.getHeight());
     }
 }
