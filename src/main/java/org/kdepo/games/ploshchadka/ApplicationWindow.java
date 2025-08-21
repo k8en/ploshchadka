@@ -8,7 +8,7 @@ public class ApplicationWindow {
 
     public ApplicationWindow(ViewPanel viewPanel) {
 
-        Simulation simulation = Simulation.getInstance();
+        Ploshchadka ploshchadka = Ploshchadka.getInstance();
 
         JFrame jframe = new JFrame();
 
@@ -23,12 +23,12 @@ public class ApplicationWindow {
                 new WindowFocusListener() {
                     @Override
                     public void windowLostFocus(WindowEvent e) {
-                        simulation.windowLostFocus(e);
+                        ploshchadka.windowLostFocus(e);
                     }
 
                     @Override
                     public void windowGainedFocus(WindowEvent e) {
-                        simulation.windowGainedFocus(e);
+                        ploshchadka.windowGainedFocus(e);
                     }
                 });
     }

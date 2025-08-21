@@ -14,8 +14,8 @@ public class ViewPanel extends JPanel {
         this.application = application;
         MouseInputs mouseInputs = new MouseInputs();
 
-        Simulation simulation = Simulation.getInstance();
-        Dimension size = new Dimension(simulation.getScreenWidth(), simulation.getScreenHeight());
+        Ploshchadka ploshchadka = Ploshchadka.getInstance();
+        Dimension size = new Dimension(ploshchadka.getScreenWidth(), ploshchadka.getScreenHeight());
         setPreferredSize(size);
 
         addKeyListener(new KeyboardInputs());

@@ -4,9 +4,9 @@ public class MainClass {
 
     public static void main(String[] args) {
         // Initialize necessary classes and settings
-        Simulation simulation = Simulation.getInstance();
-        simulation.setScreenWidth(1024);
-        simulation.setScreenHeight(960);
+        Ploshchadka ploshchadka = Ploshchadka.getInstance();
+        ploshchadka.setScreenWidth(Constants.ScreenSize.WIDTH);
+        ploshchadka.setScreenHeight(Constants.ScreenSize.HEIGHT);
 
         // Start application
         new Application();

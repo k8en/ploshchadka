@@ -1,5 +1,6 @@
 package org.kdepo.games.ploshchadka.model.custom;
 
+import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.model.base.animation.Animation;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
@@ -20,28 +21,30 @@ public class Player {
 
         BufferedImage imageFrame01 = FileUtils.loadImage("frame01.png");
         BufferedImage imageFrame02 = FileUtils.loadImage("frame02.png");
+        BufferedImage imageFrame01m = FileUtils.getImageMirroredHorizontally(imageFrame01);
+        BufferedImage imageFrame02m = FileUtils.getImageMirroredHorizontally(imageFrame02);
 
         AnimationFrame[] standRightFrames = new AnimationFrame[1];
         standRightFrames[0] = new AnimationFrame(0, imageFrame01, 999);
-        Animation standRightAnimation = new Animation("STAND_RIGHT", standRightFrames, 0);
-        animationMap.put("STAND_RIGHT", standRightAnimation);
+        Animation standRightAnimation = new Animation(Constants.AnimationName.STAND_RIGHT, standRightFrames, 0);
+        animationMap.put(Constants.AnimationName.STAND_RIGHT, standRightAnimation);
 
         AnimationFrame[] runRightFrames = new AnimationFrame[2];
         runRightFrames[0] = new AnimationFrame(0, imageFrame01, 8);
         runRightFrames[1] = new AnimationFrame(1, imageFrame02, 8);
-        Animation runRightAnimation = new Animation("RUN_RIGHT", runRightFrames, 0);
-        animationMap.put("RUN_RIGHT", runRightAnimation);
+        Animation runRightAnimation = new Animation(Constants.AnimationName.RUN_RIGHT, runRightFrames, 0);
+        animationMap.put(Constants.AnimationName.RUN_RIGHT, runRightAnimation);
 
         AnimationFrame[] standLeftFrames = new AnimationFrame[1];
-        standLeftFrames[0] = new AnimationFrame(0, imageFrame01, 999);
-        Animation standLeftAnimation = new Animation("STAND_LEFT", standLeftFrames, 0);
-        animationMap.put("STAND_LEFT", standLeftAnimation);
+        standLeftFrames[0] = new AnimationFrame(0, imageFrame01m, 999);
+        Animation standLeftAnimation = new Animation(Constants.AnimationName.STAND_LEFT, standLeftFrames, 0);
+        animationMap.put(Constants.AnimationName.STAND_LEFT, standLeftAnimation);
 
         AnimationFrame[] runLeftFrames = new AnimationFrame[2];
-        runRightFrames[0] = new AnimationFrame(0, imageFrame01, 8);
-        runRightFrames[1] = new AnimationFrame(1, imageFrame02, 8);
-        Animation runLeftAnimation = new Animation("RUN_LEFT", runLeftFrames, 0);
-        animationMap.put("RUN_LEFT", runLeftAnimation);
+        runLeftFrames[0] = new AnimationFrame(0, imageFrame01m, 8);
+        runLeftFrames[1] = new AnimationFrame(1, imageFrame02m, 8);
+        Animation runLeftAnimation = new Animation(Constants.AnimationName.RUN_LEFT, runLeftFrames, 0);
+        animationMap.put(Constants.AnimationName.RUN_LEFT, runLeftAnimation);
 
         currentAnimation = standRightAnimation;
     }
@@ -54,6 +57,8 @@ public class Player {
         currentAnimation = animationMap.get(animationName);
         if (currentAnimation == null) {
             throw new RuntimeException("Animation not found: " + animationName);
+        } else {
+            System.out.println("current animation set to " + currentAnimation.getAnimationName());
         }
         currentAnimation.reset();
     }

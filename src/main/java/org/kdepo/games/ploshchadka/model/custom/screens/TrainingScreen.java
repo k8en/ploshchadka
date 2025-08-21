@@ -1,6 +1,7 @@
 package org.kdepo.games.ploshchadka.model.custom.screens;
 
-import org.kdepo.games.ploshchadka.Simulation;
+import org.kdepo.games.ploshchadka.Constants;
+import org.kdepo.games.ploshchadka.Ploshchadka;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
@@ -19,7 +20,7 @@ import java.util.Random;
 
 public class TrainingScreen extends AbstractScreen {
 
-    private final Simulation simulation;
+    private final Ploshchadka ploshchadka;
     private final Random random;
 
     private final VirtualCamera camera;
@@ -33,11 +34,11 @@ public class TrainingScreen extends AbstractScreen {
 
     private double friction;
 
-    public TrainingScreen(Simulation simulation) {
-        this.simulation = simulation;
+    public TrainingScreen(Ploshchadka ploshchadka) {
+        this.ploshchadka = ploshchadka;
         random = new Random(new Date().getTime());
 
-        camera = new VirtualCamera(1024, 960);
+        camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
         camera.setCameraCenter(0.0d, 0.0d);
 
         ball = new Ball();
@@ -68,8 +69,8 @@ public class TrainingScreen extends AbstractScreen {
                 vectorX = -vectorX;
                 ball.setVectorX(vectorX);
             }
-            if (nextX > simulation.getScreenWidth()) {
-                nextX = simulation.getScreenWidth();
+            if (nextX > ploshchadka.getScreenWidth()) {
+                nextX = ploshchadka.getScreenWidth();
                 double vectorX = ball.getVectorX();
                 vectorX = -vectorX;
                 ball.setVectorX(vectorX);
@@ -81,8 +82,8 @@ public class TrainingScreen extends AbstractScreen {
                 vectorY = -vectorY;
                 ball.setVectorY(vectorY);
             }
-            if (nextY > simulation.getScreenHeight()) {
-                nextY = simulation.getScreenHeight();
+            if (nextY > ploshchadka.getScreenHeight()) {
+                nextY = ploshchadka.getScreenHeight();
                 double vectorY = ball.getVectorY();
                 vectorY = -vectorY;
                 ball.setVectorY(vectorY);
@@ -119,7 +120,7 @@ public class TrainingScreen extends AbstractScreen {
     public void draw(Graphics g) {
         // Clear all with selected color
         g.setColor(Color.BLACK);
-        g.fillRect(0, 0, simulation.getScreenWidth(), simulation.getScreenHeight());
+        g.fillRect(0, 0, ploshchadka.getScreenWidth(), ploshchadka.getScreenHeight());
 
         // Draw ground tiled image
         ground.draw(g, camera);
@@ -204,19 +205,19 @@ public class TrainingScreen extends AbstractScreen {
         if (KeyEvent.VK_D == e.getKeyCode()) {
             System.out.println("VK_D");
             // Move right
-            if ("STAND_RIGHT".equals(player.getCurrentAnimationName())
-                    || "STAND_LEFT".equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName("RUN_RIGHT");
-            } else if ("RUN_RIGHT".equals(player.getCurrentAnimationName())) {
+            if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())
+                    || Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+            } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
 
             }
         } else if (KeyEvent.VK_A == e.getKeyCode()) {
             System.out.println("VK_A");
             // Move Left
-            if ("STAND_LEFT".equals(player.getCurrentAnimationName())
-                    || "STAND_RIGHT".equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName("RUN_LEFT");
-            } else if ("RUN_LEFT".equals(player.getCurrentAnimationName())) {
+            if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())
+                    || Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+            } else if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
 
             }
         }
@@ -225,12 +226,12 @@ public class TrainingScreen extends AbstractScreen {
     @Override
     public void keyReleased(KeyEvent e) {
         if (KeyEvent.VK_D == e.getKeyCode()) {
-            if ("RUN_RIGHT".equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName("STAND_RIGHT");
+            if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
             }
         } else if (KeyEvent.VK_A == e.getKeyCode()) {
-            if ("RUN_LEFT".equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName("STAND_LEFT");
+            if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
             }
         }
     }

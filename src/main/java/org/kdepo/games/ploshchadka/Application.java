@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class Application implements Runnable {
 
-    private final Simulation simulation;
+    private final Ploshchadka ploshchadka;
 
     private final ViewPanel viewPanel;
     private final int FPS_SET = 60;
@@ -13,7 +13,7 @@ public class Application implements Runnable {
     private final boolean SHOW_FPS_UPS = false;
 
     public Application() {
-        simulation = Simulation.getInstance();
+        ploshchadka = Ploshchadka.getInstance();
 
         viewPanel = new ViewPanel(this);
         new ApplicationWindow(viewPanel);
@@ -24,11 +24,11 @@ public class Application implements Runnable {
     }
 
     public void update() {
-        simulation.update();
+        ploshchadka.update();
     }
 
     public void render(Graphics g) {
-        simulation.draw(g);
+        ploshchadka.draw(g);
     }
 
     @Override

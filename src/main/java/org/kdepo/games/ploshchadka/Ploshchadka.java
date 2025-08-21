@@ -8,23 +8,23 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 
-public class Simulation {
+public class Ploshchadka {
 
-    private static Simulation instance;
+    private static Ploshchadka instance;
 
     private AbstractScreen activeScreen;
 
     private int screenWidth;
     private int screenHeight;
 
-    public static Simulation getInstance() {
+    public static Ploshchadka getInstance() {
         if (instance == null) {
-            instance = new Simulation();
+            instance = new Ploshchadka();
         }
         return instance;
     }
 
-    private Simulation() {
+    private Ploshchadka() {
         activeScreen = new TrainingScreen(this);
     }
 
