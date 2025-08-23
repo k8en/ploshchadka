@@ -2,8 +2,16 @@ package org.kdepo.games.ploshchadka.model.base.tiles;
 
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
+import org.kdepo.games.ploshchadka.utils.FileUtils;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Map;
 
 public class TileMap {
 
@@ -96,6 +104,48 @@ public class TileMap {
 
     public void setTiles(Tile[][] tiles) {
         this.tiles = tiles;
+    }
+
+    public void load(String mapName) {
+        // Load used ids
+        Integer[][] tileIds = FileUtils.readFileToArray("maps\\" + mapName);
+        System.out.println("Loaded tile ids" + tileIds[0].length + "x" + tileIds.length);
+
+        // Load tiles configurations
+        String pathToImageMap = "tiles\\tiles.cfg";
+        InputStream inputStream = TileMap.class.getClassLoader().getResourceAsStream(pathToImageMap);
+        if (inputStream == null) {
+            throw new RuntimeException("File not found: " + pathToImageMap);
+        }
+
+        Map<Integer, BufferedImage> imageMap = new HashMap<>();
+
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            String configLine;
+            while ((configLine = reader.readLine()) != null) {
+                String[] configValues = configLine.split("=");
+                Integer id = Integer.parseInt(configValues[0]);
+
+                String fileName = configValues[1];
+                BufferedImage tileImage = FileUtils.loadImage("tiles\\" + fileName);
+
+                imageMap.put(id, tileImage);
+                System.out.println("Found tile image: " + id + ", " + fileName);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        // Prepare tile map
+        tiles = new Tile[tileIds.length][tileIds[0].length];
+        for (int row = 0; row < tileIds.length; row++) {
+            for (int column = 0; column < tileIds[0].length; column++) {
+                Tile tile = new Tile();
+                tile.setImage(imageMap.get(tileIds[row][column]));
+                tiles[row][column] = tile;
+            }
+        }
     }
 
     public void draw(Graphics g) {
