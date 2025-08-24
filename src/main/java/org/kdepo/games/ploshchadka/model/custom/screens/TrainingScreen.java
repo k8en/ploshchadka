@@ -271,6 +271,29 @@ public class TrainingScreen extends AbstractScreen {
 
             double nextCenterX = player.getCenterX() - player.getRunSpeed();
             player.setCenterX(nextCenterX);
+
+        } else if (KeyEvent.VK_W == e.getKeyCode()) {
+            // Move Up
+            if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+            } else if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+            }
+
+            double nextCenterY = player.getCenterY() - player.getRunSpeed();
+            player.setCenterY(nextCenterY);
+
+        } else if (KeyEvent.VK_S == e.getKeyCode()) {
+            // Move Up
+            if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+            } else if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+            }
+
+            double nextCenterY = player.getCenterY() + player.getRunSpeed();
+            player.setCenterY(nextCenterY);
+
         }
     }
 
@@ -283,6 +306,18 @@ public class TrainingScreen extends AbstractScreen {
         } else if (KeyEvent.VK_A == e.getKeyCode()) {
             if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
                 player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
+            }
+        } else if (KeyEvent.VK_W == e.getKeyCode()) {
+            if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
+            } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
+            }
+        } else if (KeyEvent.VK_S == e.getKeyCode()) {
+            if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
+            } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
             }
         }
     }
