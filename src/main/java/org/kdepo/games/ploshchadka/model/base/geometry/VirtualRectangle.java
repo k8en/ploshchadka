@@ -1,19 +1,21 @@
 package org.kdepo.games.ploshchadka.model.base.geometry;
 
+import java.util.Objects;
+
 public class VirtualRectangle {
 
     /**
      * Top left corner
      */
-    private double x;
+    protected double x;
 
     /**
      * Top left corner
      */
-    private double y;
+    protected double y;
 
-    private double width;
-    private double height;
+    protected double width;
+    protected double height;
 
     public double getX() {
         return x;
@@ -45,5 +47,20 @@ public class VirtualRectangle {
 
     public void setHeight(double height) {
         this.height = height;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        VirtualRectangle that = (VirtualRectangle) o;
+        return Double.compare(x, that.x) == 0
+                && Double.compare(y, that.y) == 0
+                && Double.compare(width, that.width) == 0
+                && Double.compare(height, that.height) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y, width, height);
     }
 }

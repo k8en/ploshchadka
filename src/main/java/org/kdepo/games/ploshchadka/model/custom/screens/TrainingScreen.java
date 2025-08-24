@@ -4,6 +4,7 @@ import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.Ploshchadka;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
+import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
 import org.kdepo.games.ploshchadka.model.custom.Ball;
@@ -24,6 +25,7 @@ public class TrainingScreen extends AbstractScreen {
     private final Random random;
 
     private final VirtualCamera camera;
+    private final VirtualRectangle screenMovementBounds;
 
     private final Ball ball;
     private double ballDistance;
@@ -38,9 +40,6 @@ public class TrainingScreen extends AbstractScreen {
         this.ploshchadka = ploshchadka;
         random = new Random(new Date().getTime());
 
-        camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
-        camera.setCameraCenter(0.0d, 0.0d);
-
         ball = new Ball();
         ballDistance = 0;
         ballDistanceForSpin = 0;
@@ -49,6 +48,15 @@ public class TrainingScreen extends AbstractScreen {
 
         ground = new Ground();
         player = new Player();
+
+        camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
+        camera.setCameraCenter(0.0d, 0.0d);
+
+        screenMovementBounds = new VirtualRectangle();
+        screenMovementBounds.setX(ground.getX());
+        screenMovementBounds.setY(ground.getY());
+        screenMovementBounds.setWidth(ground.getWidth());
+        screenMovementBounds.setHeight(ground.getHeight());
     }
 
     @Override
@@ -112,8 +120,41 @@ public class TrainingScreen extends AbstractScreen {
         }
 
         player.animate();
+        Console.addMessage("Player center(" + player.getCenterX() + "," + player.getCenterY() + "," + player.getCenterZ() + ")");
 
+        // Check if need to adjust camera position according to player position
+        if (camera.getMovementBounds().getX() > player.getCenterX()) {
+            double delta = camera.getMovementBounds().getX() - player.getCenterX();
+            camera.setX(camera.getX() - delta);
+        }
+        if (camera.getMovementBounds().getX() + camera.getMovementBounds().getWidth() < player.getCenterX()) {
+            double delta = camera.getMovementBounds().getX() + camera.getMovementBounds().getWidth() - player.getCenterX();
+            camera.setX(camera.getX() - delta);
+        }
+        if (camera.getMovementBounds().getY() > player.getCenterY()) {
+            double delta = camera.getMovementBounds().getY() - player.getCenterY();
+            camera.setY(camera.getY() - delta);
+        }
+        if (camera.getMovementBounds().getY() + camera.getMovementBounds().getHeight() < player.getCenterY()) {
+            double delta = camera.getMovementBounds().getY() + camera.getMovementBounds().getHeight() - player.getCenterY();
+            camera.setY(camera.getY() - delta);
+        }
+
+        // Check if camera is out of bounds
+        if (camera.getX() < screenMovementBounds.getX()) {
+            camera.setX(screenMovementBounds.getX());
+        } else if (camera.getX() + camera.getWidth() > screenMovementBounds.getX() + screenMovementBounds.getWidth()) {
+            camera.setX(screenMovementBounds.getX() + screenMovementBounds.getWidth() - camera.getWidth());
+        }
+        if (camera.getY() < screenMovementBounds.getY()) {
+            camera.setY(screenMovementBounds.getY());
+        } else if (camera.getY() + camera.getHeight() > screenMovementBounds.getY() + screenMovementBounds.getHeight()) {
+            camera.setY(screenMovementBounds.getY() + screenMovementBounds.getHeight() - camera.getHeight());
+        }
+
+        // Output debug information
         Console.addMessage("Camera: x=" + camera.getX() + ", y=" + camera.getY() + ", width=" + camera.getWidth() + ", height=" + camera.getHeight());
+        Console.addMessage("TileMap y=" + ground.getY());
     }
 
     @Override
@@ -126,9 +167,14 @@ public class TrainingScreen extends AbstractScreen {
         ground.draw(g, camera);
 
         // Draw ball on the ground
-        ball.draw(g);
+        ball.draw(g, camera);
 
-        player.draw(g);
+        player.draw(g, camera);
+
+        // For debug purposes
+//        g.setColor(Color.WHITE);
+//        g.drawLine(0, 0, Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
+//        g.drawLine(0, Constants.ScreenSize.HEIGHT, Constants.ScreenSize.WIDTH, 0);
 
         // Draw console output
         Console.draw(g);
@@ -210,6 +256,10 @@ public class TrainingScreen extends AbstractScreen {
             } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
 
             }
+
+            double nextCenterX = player.getCenterX() + player.getRunSpeed();
+            player.setCenterX(nextCenterX);
+
         } else if (KeyEvent.VK_A == e.getKeyCode()) {
             // Move Left
             if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())
@@ -218,6 +268,9 @@ public class TrainingScreen extends AbstractScreen {
             } else if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
 
             }
+
+            double nextCenterX = player.getCenterX() - player.getRunSpeed();
+            player.setCenterX(nextCenterX);
         }
     }
 

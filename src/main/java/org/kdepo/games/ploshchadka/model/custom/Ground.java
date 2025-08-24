@@ -19,7 +19,23 @@ public class Ground {
         tileMap.setMapHeight(32 * tileMap.getTiles().length);
 
         tileMap.setX(-tileMap.getMapWidth() / 2);
-        tileMap.setY(-tileMap.getMapHeight() / 2);
+        tileMap.setY(-tileMap.getMapHeight() / 2 - 32);
+    }
+
+    public double getX() {
+        return tileMap.getX();
+    }
+
+    public double getY() {
+        return tileMap.getY();
+    }
+
+    public double getWidth() {
+        return tileMap.getMapWidth();
+    }
+
+    public double getHeight() {
+        return tileMap.getMapHeight();
     }
 
     public void draw(Graphics g, VirtualCamera camera) {

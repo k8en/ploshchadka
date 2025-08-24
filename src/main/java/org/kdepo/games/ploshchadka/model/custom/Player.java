@@ -1,9 +1,10 @@
 package org.kdepo.games.ploshchadka.model.custom;
 
 import org.kdepo.games.ploshchadka.Constants;
+import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.Animation;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
-import org.kdepo.games.ploshchadka.model.base.utils.Console;
+import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 import org.kdepo.games.ploshchadka.utils.FileUtils;
 
 import java.awt.*;
@@ -11,12 +12,19 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player {
+public class Player extends VirtualRectangle {
+
+    private double centerX;
+    private double centerY;
+    private double centerZ;
+
+    private double runSpeed;
 
     private final Map<String, Animation> animationMap;
     private Animation currentAnimation;
 
     public Player() {
+        // Render parameters
         animationMap = new HashMap<>();
 
         BufferedImage imageFrame01 = FileUtils.loadImage("frame01.png");
@@ -47,6 +55,52 @@ public class Player {
         animationMap.put(Constants.AnimationName.RUN_LEFT, runLeftAnimation);
 
         currentAnimation = standRightAnimation;
+
+        // Virtual position parameters
+        centerX = 0;
+        centerY = 0;
+        centerZ = 0;
+        runSpeed = 3.2;
+
+        // Sprite position based on virtual position parameters
+        this.x = centerX - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
+        this.y = centerY - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
+        this.width = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth();
+        this.height = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight();
+    }
+
+    public double getCenterX() {
+        return centerX;
+    }
+
+    public void setCenterX(double centerX) {
+        this.centerX = centerX;
+        this.x = centerX - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
+    }
+
+    public double getCenterY() {
+        return centerY;
+    }
+
+    public void setCenterY(double centerY) {
+        this.centerY = centerY;
+        this.y = centerY - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
+    }
+
+    public double getCenterZ() {
+        return centerZ;
+    }
+
+    public void setCenterZ(double centerZ) {
+        this.centerZ = centerZ;
+    }
+
+    public double getRunSpeed() {
+        return runSpeed;
+    }
+
+    public void setRunSpeed(double runSpeed) {
+        this.runSpeed = runSpeed;
     }
 
     public String getCurrentAnimationName() {
@@ -71,16 +125,21 @@ public class Player {
         }
     }
 
-    public void draw(Graphics g) {
-        int onScreenX = 100;
-        int onScreenY = 100;
+    public void draw(Graphics g, VirtualCamera camera) {
+        double screenOffsetX = camera.getScreenOffsetX(this.x);
+        double screenOffsetY = camera.getScreenOffsetY(this.y) - centerZ;
 
         BufferedImage frameImage = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage();
 
         g.drawImage(
                 frameImage,
-                onScreenX, onScreenY,
+                (int) screenOffsetX, (int) screenOffsetY,
                 null
         );
+
+        if (true) {
+            g.setColor(Color.MAGENTA);
+            g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
+        }
     }
 }

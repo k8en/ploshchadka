@@ -1,5 +1,6 @@
 package org.kdepo.games.ploshchadka.model.custom;
 
+import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
 import org.kdepo.games.ploshchadka.utils.FileUtils;
 
@@ -37,8 +38,8 @@ public class Ball {
         currentFrameNumber = 0;
 
         // Position parameters
-        centerX = 100;
-        centerY = 100;
+        centerX = 0;
+        centerY = 0;
         radius = 14;
 
         // Movement parameters
@@ -111,9 +112,9 @@ public class Ball {
         }
     }
 
-    public void draw(Graphics g) {
-        int onScreenX = (int) (centerX - radius);
-        int onScreenY = (int) (centerY - radius);
+    public void draw(Graphics g, VirtualCamera camera) {
+        int onScreenX = (int) camera.getScreenOffsetX(centerX - radius);
+        int onScreenY = (int) camera.getScreenOffsetY(centerY - radius);
 
         g.drawImage(
                 animationFrames[currentFrameNumber].getFrameImage(),
