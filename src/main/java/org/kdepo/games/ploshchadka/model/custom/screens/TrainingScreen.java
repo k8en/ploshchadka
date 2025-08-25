@@ -34,6 +34,11 @@ public class TrainingScreen extends AbstractScreen {
     private Ground ground;
     private Player player;
 
+    private boolean isButtonUp;
+    private boolean isButtonRight;
+    private boolean isButtonDown;
+    private boolean isButtonLeft;
+
     private double friction;
 
     public TrainingScreen(Ploshchadka ploshchadka) {
@@ -57,6 +62,11 @@ public class TrainingScreen extends AbstractScreen {
         screenMovementBounds.setY(ground.getY());
         screenMovementBounds.setWidth(ground.getWidth());
         screenMovementBounds.setHeight(ground.getHeight());
+
+        isButtonUp = false;
+        isButtonRight = false;
+        isButtonDown = false;
+        isButtonLeft = false;
     }
 
     @Override
@@ -64,6 +74,7 @@ public class TrainingScreen extends AbstractScreen {
         // Clear all previous messages
         Console.clear();
 
+        // Update ball state
         if (ball.getSpeed() > 0) {
             double nextX;
             double nextY;
@@ -118,6 +129,84 @@ public class TrainingScreen extends AbstractScreen {
             //System.out.println("Ball speed: " + speed);
             ball.setSpeed(speed);
         }
+
+        // Update player state
+        double nextCenterX = player.getCenterX();
+        double nextCenterY = player.getCenterY();
+        if (isButtonUp && !isButtonRight && !isButtonDown && !isButtonLeft) {
+            // Move UP
+            if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+            } else if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+            }
+            nextCenterY = player.getCenterY() - player.getRunSpeed();
+
+        } else if (isButtonUp && isButtonRight && !isButtonDown && !isButtonLeft) {
+            // Move UP + RIGHT
+            if (!Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+            }
+            nextCenterX = player.getCenterX() + player.getRunSpeed();
+            nextCenterY = player.getCenterY() - player.getRunSpeed();
+
+        } else if (!isButtonUp && isButtonRight && !isButtonDown && !isButtonLeft) {
+            // Move RIGHT
+            if (!Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+            }
+            nextCenterX = player.getCenterX() + player.getRunSpeed();
+
+        } else if (!isButtonUp && isButtonRight && isButtonDown && !isButtonLeft) {
+            // Move DOWN + RIGHT
+            if (!Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+            }
+            nextCenterX = player.getCenterX() + player.getRunSpeed();
+            nextCenterY = player.getCenterY() + player.getRunSpeed();
+
+        } else if (!isButtonUp && !isButtonRight && isButtonDown && !isButtonLeft) {
+            // Move DOWN
+            if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+            } else if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+            }
+            nextCenterY = player.getCenterY() + player.getRunSpeed();
+
+        } else if (!isButtonUp && !isButtonRight && isButtonDown && isButtonLeft) {
+            // Move DOWN + LEFT
+            if (!Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+            }
+            nextCenterX = player.getCenterX() - player.getRunSpeed();
+            nextCenterY = player.getCenterY() + player.getRunSpeed();
+
+        } else if (!isButtonUp && !isButtonRight && !isButtonDown && isButtonLeft) {
+            // Move LEFT
+            if (!Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+            }
+            nextCenterX = player.getCenterX() - player.getRunSpeed();
+
+        } else if (isButtonUp && !isButtonRight && !isButtonDown && isButtonLeft) {
+            // Move UP + LEFT
+            if (!Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+            }
+            nextCenterX = player.getCenterX() - player.getRunSpeed();
+            nextCenterY = player.getCenterY() - player.getRunSpeed();
+
+        } else {
+            // Stand for other cases
+            if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
+            } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
+                player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
+            }
+        }
+        player.setCenterX(nextCenterX);
+        player.setCenterY(nextCenterY);
 
         player.animate();
         Console.addMessage("Player center(" + player.getCenterX() + "," + player.getCenterY() + "," + player.getCenterZ() + ")");
@@ -249,76 +338,26 @@ public class TrainingScreen extends AbstractScreen {
         }
 
         if (KeyEvent.VK_D == e.getKeyCode()) {
-            // Move right
-            if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())
-                    || Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
-            } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
-
-            }
-
-            double nextCenterX = player.getCenterX() + player.getRunSpeed();
-            player.setCenterX(nextCenterX);
-
+            isButtonRight = true;
         } else if (KeyEvent.VK_A == e.getKeyCode()) {
-            // Move Left
-            if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())
-                    || Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
-            } else if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
-
-            }
-
-            double nextCenterX = player.getCenterX() - player.getRunSpeed();
-            player.setCenterX(nextCenterX);
-
+            isButtonLeft = true;
         } else if (KeyEvent.VK_W == e.getKeyCode()) {
-            // Move Up
-            if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
-            } else if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
-            }
-
-            double nextCenterY = player.getCenterY() - player.getRunSpeed();
-            player.setCenterY(nextCenterY);
-
+            isButtonUp = true;
         } else if (KeyEvent.VK_S == e.getKeyCode()) {
-            // Move Up
-            if (Constants.AnimationName.STAND_LEFT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
-            } else if (Constants.AnimationName.STAND_RIGHT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
-            }
-
-            double nextCenterY = player.getCenterY() + player.getRunSpeed();
-            player.setCenterY(nextCenterY);
-
+            isButtonDown = true;
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         if (KeyEvent.VK_D == e.getKeyCode()) {
-            if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
-            }
+            isButtonRight = false;
         } else if (KeyEvent.VK_A == e.getKeyCode()) {
-            if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
-            }
+            isButtonLeft = false;
         } else if (KeyEvent.VK_W == e.getKeyCode()) {
-            if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
-            } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
-            }
+            isButtonUp = false;
         } else if (KeyEvent.VK_S == e.getKeyCode()) {
-            if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
-            } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
-                player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
-            }
+            isButtonDown = false;
         }
     }
 

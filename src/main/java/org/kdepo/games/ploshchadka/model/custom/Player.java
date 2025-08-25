@@ -38,8 +38,8 @@ public class Player extends VirtualRectangle {
         animationMap.put(Constants.AnimationName.STAND_RIGHT, standRightAnimation);
 
         AnimationFrame[] runRightFrames = new AnimationFrame[2];
-        runRightFrames[0] = new AnimationFrame(0, imageFrame01, 8);
-        runRightFrames[1] = new AnimationFrame(1, imageFrame02, 8);
+        runRightFrames[0] = new AnimationFrame(0, imageFrame02, 8);
+        runRightFrames[1] = new AnimationFrame(1, imageFrame01, 8);
         Animation runRightAnimation = new Animation(Constants.AnimationName.RUN_RIGHT, runRightFrames, 0);
         animationMap.put(Constants.AnimationName.RUN_RIGHT, runRightAnimation);
 
@@ -49,8 +49,8 @@ public class Player extends VirtualRectangle {
         animationMap.put(Constants.AnimationName.STAND_LEFT, standLeftAnimation);
 
         AnimationFrame[] runLeftFrames = new AnimationFrame[2];
-        runLeftFrames[0] = new AnimationFrame(0, imageFrame01m, 8);
-        runLeftFrames[1] = new AnimationFrame(1, imageFrame02m, 8);
+        runLeftFrames[0] = new AnimationFrame(0, imageFrame02m, 8);
+        runLeftFrames[1] = new AnimationFrame(1, imageFrame01m, 8);
         Animation runLeftAnimation = new Animation(Constants.AnimationName.RUN_LEFT, runLeftFrames, 0);
         animationMap.put(Constants.AnimationName.RUN_LEFT, runLeftAnimation);
 
@@ -60,7 +60,7 @@ public class Player extends VirtualRectangle {
         centerX = 0;
         centerY = 0;
         centerZ = 0;
-        runSpeed = 3.2;
+        runSpeed = 1.8;
 
         // Sprite position based on virtual position parameters
         this.x = centerX - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
