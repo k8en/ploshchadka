@@ -117,6 +117,10 @@ public class Player extends VirtualRectangle {
         currentAnimation.reset();
     }
 
+    public int getCurrentAnimationFrameNumber() {
+        return currentAnimation.getCurrentFrameNumber();
+    }
+
     public void animate() {
         if (currentAnimation.isFrameDisplayCompleted()) {
             currentAnimation.nextFrame();

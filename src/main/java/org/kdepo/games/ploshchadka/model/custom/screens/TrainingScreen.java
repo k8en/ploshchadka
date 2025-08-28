@@ -208,6 +208,18 @@ public class TrainingScreen extends AbstractScreen {
         player.setCenterX(nextCenterX);
         player.setCenterY(nextCenterY);
 
+        if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())
+                || Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
+            int frameNumber = player.getCurrentAnimationFrameNumber();
+            if (frameNumber == 0) {
+                player.setCenterZ(2);
+            } else {
+                player.setCenterZ(0);
+            }
+        } else {
+            player.setCenterZ(0);
+        }
+
         player.animate();
         Console.addMessage("Player center(" + player.getCenterX() + "," + player.getCenterY() + "," + player.getCenterZ() + ")");
 
