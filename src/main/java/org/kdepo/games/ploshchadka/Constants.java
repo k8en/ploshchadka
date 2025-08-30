@@ -7,6 +7,8 @@ public class Constants {
         String STAND_LEFT = "STAND_LEFT";
         String RUN_RIGHT = "RUN_RIGHT";
         String RUN_LEFT = "RUN_LEFT";
+        String KICK_RIGHT = "KICK_RIGHT";
+        String KICK_LEFT = "KICK_LEFT";
     }
 
     public interface ScreenSize {

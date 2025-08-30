@@ -23,14 +23,34 @@ public class Player extends VirtualRectangle {
     private final Map<String, Animation> animationMap;
     private Animation currentAnimation;
 
+    private FaceDirection faceDirection;
+    private PlayerState playerState;
+
+    private double kickReadiness;
+    private double kickReadinessRestoreSpeed;
+
+    private int freezeTicks;
+
     public Player() {
-        // Render parameters
+        // Player state parameters
+        faceDirection = FaceDirection.RIGHT;
+        playerState = PlayerState.STAND;
+        runSpeed = 1.8;
+
+        kickReadiness = 100d;
+        kickReadinessRestoreSpeed = 4d;
+
+        freezeTicks = 0;
+
+        // Rendering parameters
         animationMap = new HashMap<>();
 
         BufferedImage imageFrame01 = FileUtils.loadImage("frame01.png");
-        BufferedImage imageFrame02 = FileUtils.loadImage("frame02.png");
         BufferedImage imageFrame01m = FileUtils.loadImage("frame01m.png");
+        BufferedImage imageFrame02 = FileUtils.loadImage("frame02.png");
         BufferedImage imageFrame02m = FileUtils.loadImage("frame02m.png");
+        BufferedImage imageFrame03 = FileUtils.loadImage("frame03.png");
+        BufferedImage imageFrame03m = FileUtils.loadImage("frame03m.png");
 
         AnimationFrame[] standRightFrames = new AnimationFrame[1];
         standRightFrames[0] = new AnimationFrame(0, imageFrame01, 999);
@@ -54,19 +74,30 @@ public class Player extends VirtualRectangle {
         Animation runLeftAnimation = new Animation(Constants.AnimationName.RUN_LEFT, runLeftFrames, 0);
         animationMap.put(Constants.AnimationName.RUN_LEFT, runLeftAnimation);
 
+        AnimationFrame[] kickRightFrames = new AnimationFrame[1];
+        kickRightFrames[0] = new AnimationFrame(0, imageFrame03, 999);
+        Animation kickRightAnimation = new Animation(Constants.AnimationName.KICK_RIGHT, kickRightFrames, 0);
+        animationMap.put(Constants.AnimationName.KICK_RIGHT, kickRightAnimation);
+
+        AnimationFrame[] kickLeftFrames = new AnimationFrame[1];
+        kickLeftFrames[0] = new AnimationFrame(0, imageFrame03m, 999);
+        Animation kickLeftAnimation = new Animation(Constants.AnimationName.KICK_LEFT, kickLeftFrames, 0);
+        animationMap.put(Constants.AnimationName.KICK_LEFT, kickLeftAnimation);
+
+        // Resolve animation based on state parameters
         currentAnimation = standRightAnimation;
 
         // Virtual position parameters
         centerX = 0;
         centerY = 0;
         centerZ = 0;
-        runSpeed = 1.8;
 
         // Sprite position based on virtual position parameters
         this.x = centerX - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
         this.y = centerY - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
         this.width = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth();
         this.height = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight();
+
     }
 
     public double getCenterX() {
@@ -121,11 +152,40 @@ public class Player extends VirtualRectangle {
         return currentAnimation.getCurrentFrameNumber();
     }
 
+    public FaceDirection getFaceDirection() {
+        return faceDirection;
+    }
+
+    public void setFaceDirection(FaceDirection faceDirection) {
+        this.faceDirection = faceDirection;
+    }
+
+    public PlayerState getPlayerState() {
+        return playerState;
+    }
+
+    public void setPlayerState(PlayerState playerState) {
+        this.playerState = playerState;
+    }
+
     public void animate() {
         if (currentAnimation.isFrameDisplayCompleted()) {
             currentAnimation.nextFrame();
         } else {
             currentAnimation.update();
+        }
+    }
+
+    public void update() {
+        if (kickReadiness < 100d) {
+            kickReadiness = kickReadiness + kickReadinessRestoreSpeed;
+            if (kickReadiness > 100d) {
+                kickReadiness = 100d;
+            }
+        }
+
+        if (freezeTicks != 0) {
+            freezeTicks--;
         }
     }
 
@@ -145,5 +205,18 @@ public class Player extends VirtualRectangle {
             g.setColor(Color.MAGENTA);
             g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
         }
+    }
+
+    public boolean isFreezed() {
+        return freezeTicks > 0;
+    }
+
+    public boolean isReadyToKick() {
+        return kickReadiness == 100d;
+    }
+
+    public void startKick() {
+        kickReadiness = 0;
+        freezeTicks = 10;
     }
 }
