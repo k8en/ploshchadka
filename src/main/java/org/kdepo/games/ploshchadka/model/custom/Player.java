@@ -12,11 +12,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player extends VirtualRectangle {
-
-    private double centerX;
-    private double centerY;
-    private double centerZ;
+public class Player extends VirtualObject {
 
     private double runSpeed;
 
@@ -38,7 +34,7 @@ public class Player extends VirtualRectangle {
         runSpeed = 1.8;
 
         kickReadiness = 100d;
-        kickReadinessRestoreSpeed = 4d;
+        kickReadinessRestoreSpeed = 3d;
 
         freezeTicks = 0;
 
@@ -88,42 +84,27 @@ public class Player extends VirtualRectangle {
         currentAnimation = standRightAnimation;
 
         // Virtual position parameters
-        centerX = 0;
-        centerY = 0;
-        centerZ = 0;
+        this.centerX = -50;
+        this.centerY = 0;
+        this.centerZ = 0;
 
         // Sprite position based on virtual position parameters
         this.x = centerX - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
         this.y = centerY - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
         this.width = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth();
         this.height = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight();
-
     }
 
-    public double getCenterX() {
-        return centerX;
-    }
-
+    @Override
     public void setCenterX(double centerX) {
         this.centerX = centerX;
         this.x = centerX - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
     }
 
-    public double getCenterY() {
-        return centerY;
-    }
-
+    @Override
     public void setCenterY(double centerY) {
         this.centerY = centerY;
         this.y = centerY - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
-    }
-
-    public double getCenterZ() {
-        return centerZ;
-    }
-
-    public void setCenterZ(double centerZ) {
-        this.centerZ = centerZ;
     }
 
     public double getRunSpeed() {
@@ -204,6 +185,12 @@ public class Player extends VirtualRectangle {
         if (true) {
             g.setColor(Color.MAGENTA);
             g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
+
+            double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX);
+            double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY);
+            g.setColor(Color.RED);
+            g.drawLine((int) (screenOffsetCenterX - 16), (int) (screenOffsetCenterY - 16), (int) (screenOffsetCenterX + 16), (int) (screenOffsetCenterY + 16));
+            g.drawLine((int) (screenOffsetCenterX - 16), (int) (screenOffsetCenterY + 16), (int) (screenOffsetCenterX + 16), (int) (screenOffsetCenterY - 16));
         }
     }
 

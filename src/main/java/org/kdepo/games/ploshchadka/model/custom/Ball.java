@@ -7,10 +7,8 @@ import org.kdepo.games.ploshchadka.utils.FileUtils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Ball {
+public class Ball extends VirtualObject {
 
-    private double centerX;
-    private double centerY;
     private int radius;
     private double vectorX;
     private double vectorY;
@@ -20,7 +18,7 @@ public class Ball {
     private int currentFrameNumber;
 
     public Ball() {
-        // Render parameters
+        // Rendering parameters
         BufferedImage ballSprites = FileUtils.loadImage("ball.png");
 
         int framesTotal = 6;
@@ -37,33 +35,36 @@ public class Ball {
         }
         currentFrameNumber = 0;
 
-        // Position parameters
-        centerX = 0;
-        centerY = 0;
+        // Virtual position parameters
+        this.centerX = 0;
+        this.centerY = 0;
+        this.centerZ = 0;
         radius = 14;
+
+        // Sprite position based on virtual position parameters
+        this.x = centerX - animationFrames[currentFrameNumber].getFrameImage().getWidth() * 1.0 / 2;
+        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
+        this.width = animationFrames[currentFrameNumber].getFrameImage().getWidth();
+        this.height = animationFrames[currentFrameNumber].getFrameImage().getHeight();
 
         // Movement parameters
         vectorX = 0.0d;
         vectorY = 0.0d;
         speed = 0.0d;
 
-        System.out.println("Ball initialized with center at (" + centerX + "," + centerY + ")");
+        System.out.println("Ball initialized with center at (" + centerX + "," + centerY + "," + centerZ + ")");
     }
 
-    public double getCenterX() {
-        return centerX;
-    }
-
+    @Override
     public void setCenterX(double centerX) {
         this.centerX = centerX;
+        this.x = centerX - animationFrames[currentFrameNumber].getFrameImage().getWidth() * 1.0 / 2;
     }
 
-    public double getCenterY() {
-        return centerY;
-    }
-
+    @Override
     public void setCenterY(double centerY) {
         this.centerY = centerY;
+        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
     }
 
     public int getRadius() {
@@ -113,13 +114,24 @@ public class Ball {
     }
 
     public void draw(Graphics g, VirtualCamera camera) {
-        int onScreenX = (int) camera.getScreenOffsetX(centerX - radius);
-        int onScreenY = (int) camera.getScreenOffsetY(centerY - radius);
+        double screenOffsetX = camera.getScreenOffsetX(this.x);
+        double screenOffsetY = camera.getScreenOffsetY(this.y) - centerZ;
 
         g.drawImage(
                 animationFrames[currentFrameNumber].getFrameImage(),
-                onScreenX, onScreenY,
+                (int) screenOffsetX, (int) screenOffsetY,
                 null
         );
+
+        if (true) {
+            g.setColor(Color.MAGENTA);
+            g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
+
+            double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX);
+            double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY);
+            g.setColor(Color.RED);
+            g.drawLine((int) (screenOffsetCenterX - radius), (int) (screenOffsetCenterY - radius), (int) (screenOffsetCenterX + radius), (int) (screenOffsetCenterY + radius));
+            g.drawLine((int) (screenOffsetCenterX - radius), (int) (screenOffsetCenterY + radius), (int) (screenOffsetCenterX + radius), (int) (screenOffsetCenterY - radius));
+        }
     }
 }
