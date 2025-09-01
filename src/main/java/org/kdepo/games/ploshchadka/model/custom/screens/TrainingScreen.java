@@ -78,63 +78,9 @@ public class TrainingScreen extends AbstractScreen {
         // Clear all previous messages
         Console.clear();
 
-        // Update ball state
-        if (ball.getSpeed() > 0) {
-            double nextX;
-            double nextY;
+        updateBall(ball);
 
-            nextX = ball.getCenterX() + ball.getVectorX() * ball.getSpeed();
-            nextY = ball.getCenterY() + ball.getVectorY() * ball.getSpeed();
-
-            if (nextX < 0) {
-                nextX = 0;
-                double vectorX = ball.getVectorX();
-                vectorX = -vectorX;
-                ball.setVectorX(vectorX);
-            }
-            if (nextX > ploshchadka.getScreenWidth()) {
-                nextX = ploshchadka.getScreenWidth();
-                double vectorX = ball.getVectorX();
-                vectorX = -vectorX;
-                ball.setVectorX(vectorX);
-            }
-
-            if (nextY < 0) {
-                nextY = 0;
-                double vectorY = ball.getVectorY();
-                vectorY = -vectorY;
-                ball.setVectorY(vectorY);
-            }
-            if (nextY > ploshchadka.getScreenHeight()) {
-                nextY = ploshchadka.getScreenHeight();
-                double vectorY = ball.getVectorY();
-                vectorY = -vectorY;
-                ball.setVectorY(vectorY);
-            }
-
-            ballDistance = ballDistance + MathUtils.getDistance2D(ball.getCenterX(), ball.getCenterY(), nextX, nextY);
-            if (ballDistance >= ballDistanceForSpin) {
-                ballDistance = ballDistance - ballDistanceForSpin;
-                if (ball.getVectorX() >= 0) {
-                    ball.setNextFrame();
-                } else {
-                    ball.setPreviousFrame();
-                }
-            }
-
-            ball.setCenterX(nextX);
-            ball.setCenterY(nextY);
-
-            // Apply friction
-            double speed = ball.getSpeed() - friction;
-            if (speed < 0) {
-                speed = 0;
-            }
-            //System.out.println("Ball speed: " + speed);
-            ball.setSpeed(speed);
-        }
-
-        updatePlayer(player);
+        updatePlayer(player, ball);
 
         // Check if need to adjust camera position according to player position
         if (camera.getMovementBounds().getX() > player.getCenterX()) {
@@ -295,7 +241,87 @@ public class TrainingScreen extends AbstractScreen {
 
     }
 
-    public void updatePlayer(Player player) {
+    public void updateBall(Ball ball) {
+        // Update ball state
+        if (ball.getSpeed() > 0) {
+            double nextCenterX;
+            double nextCenterY;
+            double nextCenterZ;
+
+            nextCenterX = ball.getCenterX() + ball.getVectorX() * ball.getSpeed();
+            nextCenterY = ball.getCenterY() + ball.getVectorY() * ball.getSpeed();
+            nextCenterZ = ball.getCenterZ() + ball.getVectorZ() * ball.getSpeed();
+
+            if (nextCenterX < 0) {
+                nextCenterX = 0;
+                double nextVectorX = ball.getVectorX();
+                nextVectorX = -nextVectorX;
+                ball.setVectorX(nextVectorX);
+            }
+            if (nextCenterX > ploshchadka.getScreenWidth()) {
+                nextCenterX = ploshchadka.getScreenWidth();
+                double nextVectorX = ball.getVectorX();
+                nextVectorX = -nextVectorX;
+                ball.setVectorX(nextVectorX);
+            }
+
+            if (nextCenterY < 0) {
+                nextCenterY = 0;
+                double nextVectorY = ball.getVectorY();
+                nextVectorY = -nextVectorY;
+                ball.setVectorY(nextVectorY);
+            }
+            if (nextCenterY > ploshchadka.getScreenHeight()) {
+                nextCenterY = ploshchadka.getScreenHeight();
+                double nextVectorY = ball.getVectorY();
+                nextVectorY = -nextVectorY;
+                ball.setVectorY(nextVectorY);
+            }
+
+            if (nextCenterZ < 0) {
+                nextCenterZ = 0;
+                double nextSpeed = ball.getSpeed() - ball.getSpeed() / 1.85;
+                if (nextSpeed < 0.8) {
+                    nextSpeed = 0;
+                }
+                ball.setSpeed(nextSpeed);
+
+                double nextVectorZ = -ball.getVectorZ();
+                ball.setVectorZ(nextVectorZ);
+            }
+
+            ballDistance = ballDistance + MathUtils.getDistance2D(ball.getCenterX(), ball.getCenterY(), nextCenterX, nextCenterY);
+            if (ballDistance >= ballDistanceForSpin) {
+                ballDistance = ballDistance - ballDistanceForSpin;
+                if (ball.getVectorX() >= 0) {
+                    ball.setNextFrame();
+                } else {
+                    ball.setPreviousFrame();
+                }
+            }
+
+            ball.setCenterX(nextCenterX);
+            ball.setCenterY(nextCenterY);
+            ball.setCenterZ(nextCenterZ);
+
+            // Apply gravity
+            if (ball.getCenterZ() > 0) {
+                double vectorZ = ball.getVectorZ() - 0.024;
+                ball.setVectorZ(vectorZ);
+            } else if (ball.getCenterZ() == 0) {
+                // Apply friction
+                double speed = ball.getSpeed() - friction;
+                if (speed < 0) {
+                    speed = 0;
+                }
+                ball.setSpeed(speed);
+            }
+        }
+
+        Console.addMessage("Ball center(" + ball.getCenterX() + "," + ball.getCenterY() + "," + ball.getCenterZ() + ") speed=" + ball.getSpeed());
+    }
+
+    public void updatePlayer(Player player, Ball ball) {
         if (PlayerState.STAND.equals(player.getPlayerState())) {
             if (isButtonKick) {
                 // Ball KICK intent while STAY
@@ -311,6 +337,23 @@ public class TrainingScreen extends AbstractScreen {
                     }
                     player.setPlayerState(PlayerState.KICK);
                     player.startKick();
+
+                    // Hit the ball
+                    if (player.isControllingTheBall()) {
+                        if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+
+
+                        } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+
+                        } else {
+                            throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                        }
+                        ball.setVectorX(0);
+                        ball.setCenterY(0);
+                        ball.setVectorZ(1);
+                        ball.setSpeed(10);
+                        player.setControllingTheBall(false);
+                    }
 
                 }
 

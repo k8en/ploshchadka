@@ -12,14 +12,18 @@ public class Ball extends VirtualObject {
     private int radius;
     private double vectorX;
     private double vectorY;
+    private double vectorZ;
     private double speed;
 
     private final AnimationFrame[] animationFrames;
     private int currentFrameNumber;
 
+    private final BufferedImage shadowImage;
+
     public Ball() {
         // Rendering parameters
         BufferedImage ballSprites = FileUtils.loadImage("ball.png");
+        shadowImage = FileUtils.loadImage("shadow.png");
 
         int framesTotal = 6;
         int frameWidth = 28;
@@ -50,6 +54,7 @@ public class Ball extends VirtualObject {
         // Movement parameters
         vectorX = 0.0d;
         vectorY = 0.0d;
+        vectorZ = 0.0d;
         speed = 0.0d;
 
         System.out.println("Ball initialized with center at (" + centerX + "," + centerY + "," + centerZ + ")");
@@ -91,6 +96,14 @@ public class Ball extends VirtualObject {
         this.vectorY = vectorY;
     }
 
+    public double getVectorZ() {
+        return vectorZ;
+    }
+
+    public void setVectorZ(double vectorZ) {
+        this.vectorZ = vectorZ;
+    }
+
     public double getSpeed() {
         return speed;
     }
@@ -117,12 +130,25 @@ public class Ball extends VirtualObject {
         double screenOffsetX = camera.getScreenOffsetX(this.x);
         double screenOffsetY = camera.getScreenOffsetY(this.y) - centerZ;
 
+        // Draw shadow if ball in the air
+        if (centerZ > 0) {
+            double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX) - shadowImage.getWidth() / 2;
+            double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY) - shadowImage.getHeight() / 2;
+            g.drawImage(
+                    shadowImage,
+                    (int) screenOffsetCenterX, (int) screenOffsetCenterY,
+                    null
+            );
+        }
+
+        // Draw ball frame
         g.drawImage(
                 animationFrames[currentFrameNumber].getFrameImage(),
                 (int) screenOffsetX, (int) screenOffsetY,
                 null
         );
 
+        // Draw debug info
         if (true) {
             g.setColor(Color.MAGENTA);
             g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);

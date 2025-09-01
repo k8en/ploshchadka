@@ -4,7 +4,6 @@ import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.Animation;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
-import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 import org.kdepo.games.ploshchadka.utils.FileUtils;
 
 import java.awt.*;
@@ -26,6 +25,8 @@ public class Player extends VirtualObject {
     private double kickReadinessRestoreSpeed;
 
     private int freezeTicks;
+
+    private boolean isControllingTheBall;
 
     public Player() {
         // Player state parameters
@@ -93,6 +94,8 @@ public class Player extends VirtualObject {
         this.y = centerY - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
         this.width = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth();
         this.height = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight();
+
+        isControllingTheBall = true;
     }
 
     @Override
@@ -205,5 +208,13 @@ public class Player extends VirtualObject {
     public void startKick() {
         kickReadiness = 0;
         freezeTicks = 10;
+    }
+
+    public boolean isControllingTheBall() {
+        return isControllingTheBall;
+    }
+
+    public void setControllingTheBall(boolean isControllingTheBall) {
+        this.isControllingTheBall = isControllingTheBall;
     }
 }
