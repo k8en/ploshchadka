@@ -351,7 +351,7 @@ public class TrainingScreen extends AbstractScreen {
                         ball.setVectorX(0);
                         ball.setCenterY(0);
                         ball.setVectorZ(1);
-                        ball.setSpeed(10);
+                        ball.setSpeed(2);
                         player.setControllingTheBall(false);
                     }
 
