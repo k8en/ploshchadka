@@ -1,5 +1,6 @@
 package org.kdepo.games.ploshchadka.model.custom;
 
+import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
 import org.kdepo.games.ploshchadka.utils.FileUtils;
@@ -7,7 +8,7 @@ import org.kdepo.games.ploshchadka.utils.FileUtils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Ball extends VirtualObject {
+public class Ball extends DrawableObject {
 
     private int radius;
     private double vectorX;
@@ -126,6 +127,7 @@ public class Ball extends VirtualObject {
         }
     }
 
+    @Override
     public void draw(Graphics g, VirtualCamera camera) {
         double screenOffsetX = camera.getScreenOffsetX(this.x);
         double screenOffsetY = camera.getScreenOffsetY(this.y) - centerZ;
@@ -155,9 +157,9 @@ public class Ball extends VirtualObject {
 
             double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX);
             double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY);
+
             g.setColor(Color.RED);
-            g.drawLine((int) (screenOffsetCenterX - radius), (int) (screenOffsetCenterY - radius), (int) (screenOffsetCenterX + radius), (int) (screenOffsetCenterY + radius));
-            g.drawLine((int) (screenOffsetCenterX - radius), (int) (screenOffsetCenterY + radius), (int) (screenOffsetCenterX + radius), (int) (screenOffsetCenterY - radius));
+            g.drawOval((int) screenOffsetCenterX - radius, (int) screenOffsetCenterY - radius, radius * 2, radius * 2);
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.kdepo.games.ploshchadka.model.custom;
 
 import org.kdepo.games.ploshchadka.Constants;
+import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.Animation;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
@@ -11,7 +12,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Player extends VirtualObject {
+public class Player extends DrawableObject {
 
     private double runSpeed;
 
@@ -27,6 +28,7 @@ public class Player extends VirtualObject {
     private int freezeTicks;
 
     private boolean isControllingTheBall;
+    private int radius;
 
     public Player() {
         // Player state parameters
@@ -96,6 +98,7 @@ public class Player extends VirtualObject {
         this.height = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight();
 
         isControllingTheBall = true;
+        radius = 16;
     }
 
     @Override
@@ -173,6 +176,7 @@ public class Player extends VirtualObject {
         }
     }
 
+    @Override
     public void draw(Graphics g, VirtualCamera camera) {
         double screenOffsetX = camera.getScreenOffsetX(this.x);
         double screenOffsetY = camera.getScreenOffsetY(this.y) - centerZ;
@@ -191,9 +195,9 @@ public class Player extends VirtualObject {
 
             double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX);
             double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY);
+
             g.setColor(Color.RED);
-            g.drawLine((int) (screenOffsetCenterX - 16), (int) (screenOffsetCenterY - 16), (int) (screenOffsetCenterX + 16), (int) (screenOffsetCenterY + 16));
-            g.drawLine((int) (screenOffsetCenterX - 16), (int) (screenOffsetCenterY + 16), (int) (screenOffsetCenterX + 16), (int) (screenOffsetCenterY - 16));
+            g.drawOval((int) screenOffsetCenterX - radius, (int) screenOffsetCenterY - radius, radius * 2, radius * 2);
         }
     }
 
@@ -216,5 +220,13 @@ public class Player extends VirtualObject {
 
     public void setControllingTheBall(boolean isControllingTheBall) {
         this.isControllingTheBall = isControllingTheBall;
+    }
+
+    public int getRadius() {
+        return radius;
+    }
+
+    public void setRadius(int radius) {
+        this.radius = radius;
     }
 }

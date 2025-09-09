@@ -2,6 +2,7 @@ package org.kdepo.games.ploshchadka.model.custom.screens;
 
 import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.Ploshchadka;
+import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
 import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
@@ -12,13 +13,17 @@ import org.kdepo.games.ploshchadka.model.custom.FaceDirection;
 import org.kdepo.games.ploshchadka.model.custom.Ground;
 import org.kdepo.games.ploshchadka.model.custom.Player;
 import org.kdepo.games.ploshchadka.model.custom.PlayerState;
+import org.kdepo.games.ploshchadka.model.custom.VirtualObject;
 import org.kdepo.games.ploshchadka.utils.MathUtils;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 public class TrainingScreen extends AbstractScreen {
@@ -43,6 +48,8 @@ public class TrainingScreen extends AbstractScreen {
     private boolean isButtonKick;
 
     private double friction;
+
+    private List<DrawableObject> renderList;
 
     public TrainingScreen(Ploshchadka ploshchadka) {
         this.ploshchadka = ploshchadka;
@@ -71,6 +78,8 @@ public class TrainingScreen extends AbstractScreen {
         isButtonDown = false;
         isButtonLeft = false;
         isButtonKick = false;
+
+        renderList = new ArrayList<>();
     }
 
     @Override
@@ -112,6 +121,12 @@ public class TrainingScreen extends AbstractScreen {
             camera.setY(screenMovementBounds.getY() + screenMovementBounds.getHeight() - camera.getHeight());
         }
 
+        // Prepare render list ordered by Y coordinate
+        renderList.clear();
+        renderList.add(player);
+        renderList.add(ball);
+        renderList.sort(Comparator.comparing(VirtualObject::getCenterY));
+
         // Output debug information
         Console.addMessage("Camera: x=" + camera.getX() + ", y=" + camera.getY() + ", width=" + camera.getWidth() + ", height=" + camera.getHeight());
         Console.addMessage("TileMap y=" + ground.getY());
@@ -126,10 +141,10 @@ public class TrainingScreen extends AbstractScreen {
         // Draw ground tiled image
         ground.draw(g, camera);
 
-        // Draw ball on the ground
-        ball.draw(g, camera);
-
-        player.draw(g, camera);
+        // Draw sorted objects
+        for (DrawableObject object : renderList) {
+            object.draw(g, camera);
+        }
 
         // For debug purposes
 //        g.setColor(Color.WHITE);
