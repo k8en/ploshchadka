@@ -67,11 +67,18 @@ public class TrainingScreen extends AbstractScreen {
         camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
         camera.setCameraCenter(0.0d, 0.0d);
 
+        // Set camera bounds
+        camera.getMovementBounds().addToX(100);
+        camera.getMovementBounds().addToY(100);
+        camera.getMovementBounds().addToWidth(-200);
+        camera.getMovementBounds().addToHeight(-200);
+
         screenMovementBounds = new VirtualRectangle();
         screenMovementBounds.setX(ground.getX());
         screenMovementBounds.setY(ground.getY());
         screenMovementBounds.setWidth(ground.getWidth());
         screenMovementBounds.setHeight(ground.getHeight());
+        System.out.println("Screen movement bounds = " + screenMovementBounds);
 
         isButtonUp = false;
         isButtonRight = false;
@@ -91,34 +98,34 @@ public class TrainingScreen extends AbstractScreen {
 
         updatePlayer(player, ball);
 
-        // Check if need to adjust camera position according to player position
-        if (camera.getMovementBounds().getX() > player.getCenterX()) {
-            double delta = camera.getMovementBounds().getX() - player.getCenterX();
-            camera.setX(camera.getX() - delta);
+        // Check if need to adjust camera position according to ball position
+        if (camera.getMovementBounds().getX() > ball.getCenterX()) {
+            double delta = ball.getCenterX() - camera.getMovementBounds().getX();
+            camera.addToX(delta);
         }
-        if (camera.getMovementBounds().getX() + camera.getMovementBounds().getWidth() < player.getCenterX()) {
-            double delta = camera.getMovementBounds().getX() + camera.getMovementBounds().getWidth() - player.getCenterX();
-            camera.setX(camera.getX() - delta);
+        if (camera.getMovementBounds().getX() + camera.getMovementBounds().getWidth() < ball.getCenterX()) {
+            double delta = ball.getCenterX() - camera.getMovementBounds().getX() - camera.getMovementBounds().getWidth();
+            camera.addToX(delta);
         }
-        if (camera.getMovementBounds().getY() > player.getCenterY()) {
-            double delta = camera.getMovementBounds().getY() - player.getCenterY();
-            camera.setY(camera.getY() - delta);
+        if (camera.getMovementBounds().getY() > ball.getCenterY()) {
+            double delta = ball.getCenterY() - camera.getMovementBounds().getY();
+            camera.addToY(delta);
         }
-        if (camera.getMovementBounds().getY() + camera.getMovementBounds().getHeight() < player.getCenterY()) {
-            double delta = camera.getMovementBounds().getY() + camera.getMovementBounds().getHeight() - player.getCenterY();
-            camera.setY(camera.getY() - delta);
+        if (camera.getMovementBounds().getY() + camera.getMovementBounds().getHeight() < ball.getCenterY()) {
+            double delta = ball.getCenterY() - camera.getMovementBounds().getY() - camera.getMovementBounds().getHeight();
+            camera.addToY(delta);
         }
 
-        // Check if camera is out of bounds
+        // Check if camera is out of world bounds
         if (camera.getX() < screenMovementBounds.getX()) {
             camera.setX(screenMovementBounds.getX());
-        } else if (camera.getX() + camera.getWidth() > screenMovementBounds.getX() + screenMovementBounds.getWidth()) {
-            camera.setX(screenMovementBounds.getX() + screenMovementBounds.getWidth() - camera.getWidth());
+        } else if (camera.getX() + camera.getWidth() >= screenMovementBounds.getX() + screenMovementBounds.getWidth()) {
+            camera.setX(screenMovementBounds.getX() + screenMovementBounds.getWidth() - camera.getWidth() - 1);
         }
         if (camera.getY() < screenMovementBounds.getY()) {
             camera.setY(screenMovementBounds.getY());
-        } else if (camera.getY() + camera.getHeight() > screenMovementBounds.getY() + screenMovementBounds.getHeight()) {
-            camera.setY(screenMovementBounds.getY() + screenMovementBounds.getHeight() - camera.getHeight());
+        } else if (camera.getY() + camera.getHeight() >= screenMovementBounds.getY() + screenMovementBounds.getHeight()) {
+            camera.setY(screenMovementBounds.getY() + screenMovementBounds.getHeight() - camera.getHeight() - 1);
         }
 
         // Prepare render list ordered by Y coordinate
@@ -129,7 +136,6 @@ public class TrainingScreen extends AbstractScreen {
 
         // Output debug information
         Console.addMessage("Camera: x=" + camera.getX() + ", y=" + camera.getY() + ", width=" + camera.getWidth() + ", height=" + camera.getHeight());
-        Console.addMessage("TileMap y=" + ground.getY());
     }
 
     @Override
@@ -146,10 +152,14 @@ public class TrainingScreen extends AbstractScreen {
             object.draw(g, camera);
         }
 
-        // For debug purposes
-//        g.setColor(Color.WHITE);
-//        g.drawLine(0, 0, Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
-//        g.drawLine(0, Constants.ScreenSize.HEIGHT, Constants.ScreenSize.WIDTH, 0);
+        // Draw camera bounds for debug purposes
+        g.setColor(Color.ORANGE);
+        g.drawRect(
+                (int) camera.getScreenOffsetX(camera.getMovementBounds().getX()),
+                (int) camera.getScreenOffsetY(camera.getMovementBounds().getY()),
+                (int) camera.getMovementBounds().getWidth(),
+                (int) camera.getMovementBounds().getHeight()
+        );
 
         // Draw console output
         Console.draw(g);

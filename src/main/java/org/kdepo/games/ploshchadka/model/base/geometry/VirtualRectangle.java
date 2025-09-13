@@ -17,12 +17,27 @@ public class VirtualRectangle {
     protected double width;
     protected double height;
 
+    public VirtualRectangle() {
+
+    }
+
+    public VirtualRectangle(double x, double y, double width, double height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
+
     public double getX() {
         return x;
     }
 
     public void setX(double x) {
         this.x = x;
+    }
+
+    public void addToX(double delta) {
+        this.x = this.x + delta;
     }
 
     public double getY() {
@@ -33,6 +48,10 @@ public class VirtualRectangle {
         this.y = y;
     }
 
+    public void addToY(double delta) {
+        this.y = this.y + delta;
+    }
+
     public double getWidth() {
         return width;
     }
@@ -41,12 +60,20 @@ public class VirtualRectangle {
         this.width = width;
     }
 
+    public void addToWidth(double delta) {
+        this.width = this.width + delta;
+    }
+
     public double getHeight() {
         return height;
     }
 
     public void setHeight(double height) {
         this.height = height;
+    }
+
+    public void addToHeight(double delta) {
+        this.height = this.height + delta;
     }
 
     @Override
@@ -62,5 +89,15 @@ public class VirtualRectangle {
     @Override
     public int hashCode() {
         return Objects.hash(x, y, width, height);
+    }
+
+    @Override
+    public String toString() {
+        return "VirtualRectangle{" +
+                "x=" + x +
+                ", y=" + y +
+                ", width=" + width +
+                ", height=" + height +
+                '}';
     }
 }

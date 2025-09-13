@@ -27,24 +27,36 @@ public class VirtualCamera extends VirtualRectangle {
         this.y = -height / 2.0;
 
         this.movementBounds = new VirtualRectangle();
-        movementBounds.setX(x);
-        movementBounds.setY(y);
-        movementBounds.setWidth(width);
-        movementBounds.setHeight(height);
+        movementBounds.setX(this.x);
+        movementBounds.setY(this.y);
+        movementBounds.setWidth(this.width);
+        movementBounds.setHeight(this.height);
     }
 
     @Override
     public void setX(double x) {
-        double dX = x - this.x;
+        double delta = x - this.x;
         super.setX(x);
-        movementBounds.setX(movementBounds.getX() + dX);
+        movementBounds.addToX(delta);
+    }
+
+    @Override
+    public void addToX(double delta) {
+        super.addToX(delta);
+        movementBounds.addToX(delta);
     }
 
     @Override
     public void setY(double y) {
-        double dY = y - this.y;
+        double delta = y - this.y;
         super.setY(y);
-        movementBounds.setY(movementBounds.getY() + dY);
+        movementBounds.addToY(delta);
+    }
+
+    @Override
+    public void addToY(double delta) {
+        super.addToY(delta);
+        movementBounds.addToY(delta);
     }
 
     public VirtualRectangle getMovementBounds() {
