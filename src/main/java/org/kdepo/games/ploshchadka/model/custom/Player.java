@@ -15,6 +15,7 @@ import java.util.Map;
 public class Player extends DrawableObject {
 
     private double runSpeed;
+    private double dashSpeed;
 
     private final Map<String, Animation> animationMap;
     private Animation currentAnimation;
@@ -27,14 +28,18 @@ public class Player extends DrawableObject {
 
     private int freezeTicks;
 
-    private boolean isControllingTheBall;
     private int radius;
 
+    private boolean isControllingTheBall;
+
     public Player() {
+        id = 1;
+
         // Player state parameters
         faceDirection = FaceDirection.RIGHT;
         playerState = PlayerState.STAND;
         runSpeed = 1.8;
+        dashSpeed = runSpeed * 1.6;
 
         kickReadiness = 100d;
         kickReadinessRestoreSpeed = 3d;
@@ -44,13 +49,25 @@ public class Player extends DrawableObject {
         // Rendering parameters
         animationMap = new HashMap<>();
 
+        // Prepare frames images
         BufferedImage imageFrame01 = FileUtils.loadImage("frame01.png");
         BufferedImage imageFrame01m = FileUtils.loadImage("frame01m.png");
         BufferedImage imageFrame02 = FileUtils.loadImage("frame02.png");
         BufferedImage imageFrame02m = FileUtils.loadImage("frame02m.png");
         BufferedImage imageFrame03 = FileUtils.loadImage("frame03.png");
         BufferedImage imageFrame03m = FileUtils.loadImage("frame03m.png");
+        BufferedImage imageFrame04 = FileUtils.loadImage("frame04.png");
+        BufferedImage imageFrame04m = FileUtils.loadImage("frame04m.png");
+        BufferedImage imageFrame05 = FileUtils.loadImage("frame05.png");
+        BufferedImage imageFrame05m = FileUtils.loadImage("frame05m.png");
+        BufferedImage imageFrame06 = FileUtils.loadImage("frame06.png");
+        BufferedImage imageFrame06m = FileUtils.loadImage("frame06m.png");
+        BufferedImage imageFrame07 = FileUtils.loadImage("frame07.png");
+        BufferedImage imageFrame07m = FileUtils.loadImage("frame07m.png");
+        BufferedImage imageFrame08 = FileUtils.loadImage("frame08.png");
+        BufferedImage imageFrame08m = FileUtils.loadImage("frame08m.png");
 
+        // Prepare animations
         AnimationFrame[] standRightFrames = new AnimationFrame[1];
         standRightFrames[0] = new AnimationFrame(0, imageFrame01, 999);
         Animation standRightAnimation = new Animation(Constants.AnimationName.STAND_RIGHT, standRightFrames, 0);
@@ -97,7 +114,7 @@ public class Player extends DrawableObject {
         this.width = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth();
         this.height = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight();
 
-        isControllingTheBall = true;
+        isControllingTheBall = false;
         radius = 16;
     }
 

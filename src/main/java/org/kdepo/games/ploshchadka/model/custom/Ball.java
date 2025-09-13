@@ -21,6 +21,8 @@ public class Ball extends DrawableObject {
 
     private final BufferedImage shadowImage;
 
+    private Player controlledBy;
+
     public Ball() {
         // Rendering parameters
         BufferedImage ballSprites = FileUtils.loadImage("ball.png");
@@ -125,6 +127,14 @@ public class Ball extends DrawableObject {
         if (currentFrameNumber < 0) {
             currentFrameNumber = animationFrames.length - 1;
         }
+    }
+
+    public Player getControlledBy() {
+        return controlledBy;
+    }
+
+    public void setControlledBy(Player player) {
+        this.controlledBy = player;
     }
 
     @Override

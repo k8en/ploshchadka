@@ -267,27 +267,27 @@ public class TrainingScreen extends AbstractScreen {
             nextCenterY = ball.getCenterY() + ball.getVectorY() * ball.getSpeed();
             nextCenterZ = ball.getCenterZ() + ball.getVectorZ() * ball.getSpeed();
 
-            if (nextCenterX < 0) {
-                nextCenterX = 0;
+            if (nextCenterX < ground.getX()) {
+                nextCenterX = ground.getX();
                 double nextVectorX = ball.getVectorX();
                 nextVectorX = -nextVectorX;
                 ball.setVectorX(nextVectorX);
             }
-            if (nextCenterX > ploshchadka.getScreenWidth()) {
-                nextCenterX = ploshchadka.getScreenWidth();
+            if (nextCenterX > ground.getX() + ground.getWidth()) {
+                nextCenterX = ground.getX() + ground.getWidth();
                 double nextVectorX = ball.getVectorX();
                 nextVectorX = -nextVectorX;
                 ball.setVectorX(nextVectorX);
             }
 
-            if (nextCenterY < 0) {
-                nextCenterY = 0;
+            if (nextCenterY < ground.getY()) {
+                nextCenterY = ground.getY();
                 double nextVectorY = ball.getVectorY();
                 nextVectorY = -nextVectorY;
                 ball.setVectorY(nextVectorY);
             }
-            if (nextCenterY > ploshchadka.getScreenHeight()) {
-                nextCenterY = ploshchadka.getScreenHeight();
+            if (nextCenterY > ground.getY() + ground.getHeight()) {
+                nextCenterY = ground.getY() + ground.getHeight();
                 double nextVectorY = ball.getVectorY();
                 nextVectorY = -nextVectorY;
                 ball.setVectorY(nextVectorY);
@@ -328,8 +328,15 @@ public class TrainingScreen extends AbstractScreen {
                 double speed = ball.getSpeed() - friction;
                 if (speed < 0) {
                     speed = 0;
+                    ball.setVectorX(0); //?
+                    ball.setVectorY(0);
+                    ball.setVectorZ(0);
                 }
                 ball.setSpeed(speed);
+            }
+
+            if (ball.getControlledBy() != null && ball.getCenterZ() > ball.getRadius()) {
+                ball.setControlledBy(null);
             }
         }
 
@@ -339,7 +346,7 @@ public class TrainingScreen extends AbstractScreen {
     public void updatePlayer(Player player, Ball ball) {
         if (PlayerState.STAND.equals(player.getPlayerState())) {
             if (isButtonKick) {
-                // Ball KICK intent while STAY
+                // Ball KICK intent while STAND
                 if (player.isReadyToKick()) {
                     if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
                         player.setCurrentAnimationByName(Constants.AnimationName.KICK_RIGHT);
@@ -354,7 +361,7 @@ public class TrainingScreen extends AbstractScreen {
                     player.startKick();
 
                     // Hit the ball
-                    if (player.isControllingTheBall()) {
+                    if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
                         if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
 
 
@@ -364,16 +371,15 @@ public class TrainingScreen extends AbstractScreen {
                             throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
                         }
                         ball.setVectorX(0);
-                        ball.setCenterY(0);
+                        ball.setVectorY(0);
                         ball.setVectorZ(1);
                         ball.setSpeed(2);
-                        player.setControllingTheBall(false);
                     }
 
                 }
 
             } else if (isButtonUp && !isButtonRight && !isButtonDown && !isButtonLeft) {
-                // Move UP intent while STAY
+                // Move UP intent while STAND
                 if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
                     player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
 
@@ -387,9 +393,10 @@ public class TrainingScreen extends AbstractScreen {
 
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (isButtonUp && isButtonRight && !isButtonDown && !isButtonLeft) {
-                // Move UP + RIGHT intent while STAY
+                // Move UP + RIGHT intent while STAND
                 player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
                 player.setFaceDirection(FaceDirection.RIGHT);
                 player.setPlayerState(PlayerState.RUN);
@@ -398,18 +405,20 @@ public class TrainingScreen extends AbstractScreen {
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
                 player.setCenterX(nextCenterX);
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && isButtonRight && !isButtonDown && !isButtonLeft) {
-                // Move RIGHT intent while STAY
+                // Move RIGHT intent while STAND
                 player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
                 player.setFaceDirection(FaceDirection.RIGHT);
                 player.setPlayerState(PlayerState.RUN);
 
                 double nextCenterX = player.getCenterX() + player.getRunSpeed();
                 player.setCenterX(nextCenterX);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && isButtonRight && isButtonDown && !isButtonLeft) {
-                // Move DOWN + RIGHT intent while STAY
+                // Move DOWN + RIGHT intent while STAND
                 player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
                 player.setFaceDirection(FaceDirection.RIGHT);
                 player.setPlayerState(PlayerState.RUN);
@@ -418,9 +427,10 @@ public class TrainingScreen extends AbstractScreen {
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
                 player.setCenterX(nextCenterX);
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && !isButtonRight && isButtonDown && !isButtonLeft) {
-                // Move DOWN intent while STAY
+                // Move DOWN intent while STAND
                 if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
                     player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
 
@@ -434,9 +444,10 @@ public class TrainingScreen extends AbstractScreen {
 
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && !isButtonRight && isButtonDown && isButtonLeft) {
-                // Move DOWN + LEFT intent while STAY
+                // Move DOWN + LEFT intent while STAND
                 player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
                 player.setFaceDirection(FaceDirection.LEFT);
                 player.setPlayerState(PlayerState.RUN);
@@ -445,18 +456,20 @@ public class TrainingScreen extends AbstractScreen {
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
                 player.setCenterX(nextCenterX);
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && !isButtonRight && !isButtonDown && isButtonLeft) {
-                // Move LEFT intent while STAY
+                // Move LEFT intent while STAND
                 player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
                 player.setFaceDirection(FaceDirection.LEFT);
                 player.setPlayerState(PlayerState.RUN);
 
                 double nextCenterX = player.getCenterX() - player.getRunSpeed();
                 player.setCenterX(nextCenterX);
+                checkBallControl(player, ball);
 
             } else if (isButtonUp && !isButtonRight && !isButtonDown && isButtonLeft) {
-                // Move UP + LEFT intent while STAY
+                // Move UP + LEFT intent while STAND
                 player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
                 player.setFaceDirection(FaceDirection.LEFT);
                 player.setPlayerState(PlayerState.RUN);
@@ -465,7 +478,10 @@ public class TrainingScreen extends AbstractScreen {
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
                 player.setCenterX(nextCenterX);
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
+            } else {
+                checkBallControl(player, ball);
             }
 
         } else if (PlayerState.RUN.equals(player.getPlayerState())) {
@@ -484,12 +500,29 @@ public class TrainingScreen extends AbstractScreen {
                     player.setPlayerState(PlayerState.KICK);
                     player.startKick();
 
+                    // Hit the ball
+                    if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
+                        if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+                            ball.setVectorX(0.7);
+
+                        } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                            ball.setVectorX(-0.7);
+
+                        } else {
+                            throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                        }
+
+                        ball.setVectorY(0);
+                        ball.setVectorZ(0.7);
+                        ball.setSpeed(6);
+                    }
                 }
 
             } else if (isButtonUp && !isButtonRight && !isButtonDown && !isButtonLeft) {
                 // Move UP intent while RUN
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (isButtonUp && isButtonRight && !isButtonDown && !isButtonLeft) {
                 // Move UP + RIGHT intent while RUN
@@ -502,6 +535,7 @@ public class TrainingScreen extends AbstractScreen {
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
                 player.setCenterX(nextCenterX);
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && isButtonRight && !isButtonDown && !isButtonLeft) {
                 // Move RIGHT intent while RUN
@@ -512,6 +546,7 @@ public class TrainingScreen extends AbstractScreen {
 
                 double nextCenterX = player.getCenterX() + player.getRunSpeed();
                 player.setCenterX(nextCenterX);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && isButtonRight && isButtonDown && !isButtonLeft) {
                 // Move DOWN + RIGHT intent while RUN
@@ -524,11 +559,13 @@ public class TrainingScreen extends AbstractScreen {
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
                 player.setCenterX(nextCenterX);
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && !isButtonRight && isButtonDown && !isButtonLeft) {
                 // Move DOWN intent while RUN
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && !isButtonRight && isButtonDown && isButtonLeft) {
                 // Move DOWN + LEFT intent while RUN
@@ -541,6 +578,7 @@ public class TrainingScreen extends AbstractScreen {
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
                 player.setCenterX(nextCenterX);
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else if (!isButtonUp && !isButtonRight && !isButtonDown && isButtonLeft) {
                 // Move LEFT intent while RUN
@@ -551,6 +589,7 @@ public class TrainingScreen extends AbstractScreen {
 
                 double nextCenterX = player.getCenterX() - player.getRunSpeed();
                 player.setCenterX(nextCenterX);
+                checkBallControl(player, ball);
 
             } else if (isButtonUp && !isButtonRight && !isButtonDown && isButtonLeft) {
                 // Move UP + LEFT intent while RUN
@@ -563,6 +602,7 @@ public class TrainingScreen extends AbstractScreen {
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
                 player.setCenterX(nextCenterX);
                 player.setCenterY(nextCenterY);
+                checkBallControl(player, ball);
 
             } else {
                 // Switch to STAY for other cases
@@ -572,6 +612,7 @@ public class TrainingScreen extends AbstractScreen {
                     player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
                 }
                 player.setPlayerState(PlayerState.STAND);
+                checkBallControl(player, ball);
 
             }
 
@@ -609,5 +650,29 @@ public class TrainingScreen extends AbstractScreen {
         player.update();
 
         Console.addMessage("Player center(" + player.getCenterX() + "," + player.getCenterY() + "," + player.getCenterZ() + ") state=" + player.getPlayerState());
+    }
+
+    private void checkBallControl(Player player, Ball ball) {
+        // Get distance between player and ball
+        double distanceToBall = MathUtils.getDistance2D(player.getCenterX(), player.getCenterY(), ball.getCenterX(), ball.getCenterY());
+
+        if (ball.getControlledBy() == null) {
+            // If ball is not controlled by any player
+            if (distanceToBall <= player.getRadius() + ball.getRadius()) {
+                // If distance between player and ball is enough to acquire control
+                ball.setControlledBy(player);
+            }
+        } else if (player.getId() == ball.getControlledBy().getId()) {
+            // If ball is controlled by player
+            if (distanceToBall > player.getRadius() + ball.getRadius()) {
+                // If ball is too far from player - need to adjust distance
+                Vector2D vector2D = MathUtils.getVector2D(ball.getCenterX(), ball.getCenterY(), player.getCenterX(), player.getCenterY());
+                Vector2D vector2DNormalized = MathUtils.getVector2DNormalized(vector2D.getX(), vector2D.getY());
+                ball.setVectorX(vector2DNormalized.getX());
+                ball.setVectorY(vector2DNormalized.getY());
+                ball.setVectorZ(0);
+                ball.setSpeed(3D);
+            }
+        }
     }
 }

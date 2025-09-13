@@ -4,6 +4,8 @@ import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 
 public class VirtualObject extends VirtualRectangle {
 
+    protected int id;
+
     /**
      * From left to right
      */
@@ -18,6 +20,14 @@ public class VirtualObject extends VirtualRectangle {
      * From bottom to top
      */
     protected double centerZ;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public double getCenterX() {
         return centerX;
