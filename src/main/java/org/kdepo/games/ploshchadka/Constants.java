@@ -12,8 +12,8 @@ public class Constants {
     }
 
     public interface ScreenSize {
-        int WIDTH = 1024;
-        int HEIGHT = 960;
+        int WIDTH = 800;
+        int HEIGHT = 600;
     }
 
     private Constants() {
