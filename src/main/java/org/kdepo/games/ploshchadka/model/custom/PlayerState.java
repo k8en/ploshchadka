@@ -15,5 +15,6 @@ public enum PlayerState {
     TACKLE,
 
     KICK,
+    POWER_KICK
 
 }

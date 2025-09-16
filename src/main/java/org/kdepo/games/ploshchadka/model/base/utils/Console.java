@@ -20,7 +20,7 @@ public class Console {
         int x = 10;
         int y = 15;
 
-        g.setColor(Color.YELLOW);
+        g.setColor(Color.BLACK);
 
         for (String message : MESSAGES) {
             g.drawString(message, x, y);

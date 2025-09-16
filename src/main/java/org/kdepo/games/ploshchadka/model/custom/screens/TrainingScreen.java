@@ -4,6 +4,7 @@ import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.Ploshchadka;
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
+import org.kdepo.games.ploshchadka.model.base.animation.AnimationPlayMode;
 import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
 import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
@@ -46,10 +47,11 @@ public class TrainingScreen extends AbstractScreen {
     private boolean isButtonDown;
     private boolean isButtonLeft;
     private boolean isButtonKick;
+    private boolean isButtonPowerKick;
 
     private double friction;
 
-    private List<DrawableObject> renderList;
+    private final List<DrawableObject> renderList;
 
     public TrainingScreen(Ploshchadka ploshchadka) {
         this.ploshchadka = ploshchadka;
@@ -68,10 +70,10 @@ public class TrainingScreen extends AbstractScreen {
         camera.setCameraCenter(0.0d, 0.0d);
 
         // Set camera bounds
-        camera.getMovementBounds().addToX(100);
-        camera.getMovementBounds().addToY(100);
-        camera.getMovementBounds().addToWidth(-200);
-        camera.getMovementBounds().addToHeight(-200);
+        camera.getMovementBounds().addToX(150);
+        camera.getMovementBounds().addToY(150);
+        camera.getMovementBounds().addToWidth(-300);
+        camera.getMovementBounds().addToHeight(-300);
 
         screenMovementBounds = new VirtualRectangle();
         screenMovementBounds.setX(ground.getX());
@@ -85,6 +87,7 @@ public class TrainingScreen extends AbstractScreen {
         isButtonDown = false;
         isButtonLeft = false;
         isButtonKick = false;
+        isButtonPowerKick = false;
 
         renderList = new ArrayList<>();
     }
@@ -98,35 +101,7 @@ public class TrainingScreen extends AbstractScreen {
 
         updatePlayer(player, ball);
 
-        // Check if need to adjust camera position according to ball position
-        if (camera.getMovementBounds().getX() > ball.getCenterX()) {
-            double delta = ball.getCenterX() - camera.getMovementBounds().getX();
-            camera.addToX(delta);
-        }
-        if (camera.getMovementBounds().getX() + camera.getMovementBounds().getWidth() < ball.getCenterX()) {
-            double delta = ball.getCenterX() - camera.getMovementBounds().getX() - camera.getMovementBounds().getWidth();
-            camera.addToX(delta);
-        }
-        if (camera.getMovementBounds().getY() > ball.getCenterY()) {
-            double delta = ball.getCenterY() - camera.getMovementBounds().getY();
-            camera.addToY(delta);
-        }
-        if (camera.getMovementBounds().getY() + camera.getMovementBounds().getHeight() < ball.getCenterY()) {
-            double delta = ball.getCenterY() - camera.getMovementBounds().getY() - camera.getMovementBounds().getHeight();
-            camera.addToY(delta);
-        }
-
-        // Check if camera is out of world bounds
-        if (camera.getX() < screenMovementBounds.getX()) {
-            camera.setX(screenMovementBounds.getX());
-        } else if (camera.getX() + camera.getWidth() >= screenMovementBounds.getX() + screenMovementBounds.getWidth()) {
-            camera.setX(screenMovementBounds.getX() + screenMovementBounds.getWidth() - camera.getWidth() - 1);
-        }
-        if (camera.getY() < screenMovementBounds.getY()) {
-            camera.setY(screenMovementBounds.getY());
-        } else if (camera.getY() + camera.getHeight() >= screenMovementBounds.getY() + screenMovementBounds.getHeight()) {
-            camera.setY(screenMovementBounds.getY() + screenMovementBounds.getHeight() - camera.getHeight() - 1);
-        }
+        updateCamera(camera, screenMovementBounds, ball);
 
         // Prepare render list ordered by Y coordinate
         renderList.clear();
@@ -144,7 +119,7 @@ public class TrainingScreen extends AbstractScreen {
         g.setColor(Color.BLACK);
         g.fillRect(0, 0, ploshchadka.getScreenWidth(), ploshchadka.getScreenHeight());
 
-        // Draw ground tiled image
+        // Draw tiled ground
         ground.draw(g, camera);
 
         // Draw sorted objects
@@ -153,13 +128,13 @@ public class TrainingScreen extends AbstractScreen {
         }
 
         // Draw camera bounds for debug purposes
-        g.setColor(Color.ORANGE);
-        g.drawRect(
-                (int) camera.getScreenOffsetX(camera.getMovementBounds().getX()),
-                (int) camera.getScreenOffsetY(camera.getMovementBounds().getY()),
-                (int) camera.getMovementBounds().getWidth(),
-                (int) camera.getMovementBounds().getHeight()
-        );
+//        g.setColor(Color.ORANGE);
+//        g.drawRect(
+//                (int) camera.getScreenOffsetX(camera.getMovementBounds().getX()),
+//                (int) camera.getScreenOffsetY(camera.getMovementBounds().getY()),
+//                (int) camera.getMovementBounds().getWidth(),
+//                (int) camera.getMovementBounds().getHeight()
+//        );
 
         // Draw console output
         Console.draw(g);
@@ -233,6 +208,8 @@ public class TrainingScreen extends AbstractScreen {
             isButtonDown = true;
         } else if (KeyEvent.VK_SPACE == e.getKeyCode()) {
             isButtonKick = true;
+        } else if (KeyEvent.VK_C == e.getKeyCode()) {
+            isButtonPowerKick = true;
         }
     }
 
@@ -248,6 +225,8 @@ public class TrainingScreen extends AbstractScreen {
             isButtonDown = false;
         } else if (KeyEvent.VK_SPACE == e.getKeyCode()) {
             isButtonKick = false;
+        } else if (KeyEvent.VK_C == e.getKeyCode()) {
+            isButtonPowerKick = false;
         }
     }
 
@@ -357,48 +336,94 @@ public class TrainingScreen extends AbstractScreen {
         if (PlayerState.STAND.equals(player.getPlayerState())) {
             if (isButtonKick) {
                 // Ball KICK intent while STAND
-                if (player.isReadyToKick()) {
-                    if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
-                        player.setCurrentAnimationByName(Constants.AnimationName.KICK_RIGHT);
-
-                    } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
-                        player.setCurrentAnimationByName(Constants.AnimationName.KICK_LEFT);
-
-                    } else {
-                        throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
-                    }
-                    player.setPlayerState(PlayerState.KICK);
-                    player.startKick();
-
-                    // Hit the ball
-                    if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
+                if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
+                    // Player is controlling the ball
+                    if (player.isReadyToKick()) {
+                        // Player is ready to kick the ball
                         if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
-
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.KICK_RIGHT);
 
                         } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.KICK_LEFT);
 
                         } else {
                             throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
                         }
-                        ball.setVectorX(0);
-                        ball.setVectorY(0);
-                        ball.setVectorZ(1);
-                        ball.setSpeed(2);
+
+                        player.getAnimationsController().setPlayMode(AnimationPlayMode.SINGLE);
+                        player.getAnimationsController().setPlayCompleted(false);
+                        player.getAnimationsController().resetCurrentFrameNumber();
+                        player.getAnimationsController().setTicksPassed(0);
+
+                        player.setPlayerState(PlayerState.KICK);
+                        player.startKick();
+
+                        // Hit the ball
+                        if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
+                            if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+
+                            } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+
+                            } else {
+                                throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                            }
+                            ball.setVectorX(0);
+                            ball.setVectorY(0);
+                            ball.setVectorZ(1);
+                            ball.setSpeed(2);
+                        }
                     }
+
+                } else {
+                    // Player is not controlling the ball
+
+                }
+
+            } else if (isButtonPowerKick) {
+                // Ball POWER KICK intent while STAND
+                if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
+                    // Player is controlling the ball
+                    if (player.isReadyToKick()) {
+                        if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.POWER_KICK_RIGHT);
+
+                        } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.POWER_KICK_LEFT);
+
+                        } else {
+                            throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                        }
+
+                        player.getAnimationsController().setPlayMode(AnimationPlayMode.SINGLE);
+                        player.getAnimationsController().setPlayCompleted(false);
+                        player.getAnimationsController().resetCurrentFrameNumber();
+                        player.getAnimationsController().setTicksPassed(0);
+
+                        player.setPlayerState(PlayerState.POWER_KICK);
+                    }
+
+                } else {
+                    // Player is not controlling the ball
 
                 }
 
             } else if (isButtonUp && !isButtonRight && !isButtonDown && !isButtonLeft) {
                 // Move UP intent while STAND
                 if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_RIGHT);
 
                 } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_LEFT);
 
                 } else {
                     throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
                 }
+
+                player.getAnimationsController().setPlayMode(AnimationPlayMode.LOOP);
+                player.getAnimationsController().setPlayCompleted(false);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
+
                 player.setPlayerState(PlayerState.RUN);
 
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
@@ -407,7 +432,9 @@ public class TrainingScreen extends AbstractScreen {
 
             } else if (isButtonUp && isButtonRight && !isButtonDown && !isButtonLeft) {
                 // Move UP + RIGHT intent while STAND
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+                player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_RIGHT);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.RIGHT);
                 player.setPlayerState(PlayerState.RUN);
 
@@ -419,7 +446,9 @@ public class TrainingScreen extends AbstractScreen {
 
             } else if (!isButtonUp && isButtonRight && !isButtonDown && !isButtonLeft) {
                 // Move RIGHT intent while STAND
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+                player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_RIGHT);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.RIGHT);
                 player.setPlayerState(PlayerState.RUN);
 
@@ -429,7 +458,9 @@ public class TrainingScreen extends AbstractScreen {
 
             } else if (!isButtonUp && isButtonRight && isButtonDown && !isButtonLeft) {
                 // Move DOWN + RIGHT intent while STAND
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+                player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_RIGHT);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.RIGHT);
                 player.setPlayerState(PlayerState.RUN);
 
@@ -442,14 +473,20 @@ public class TrainingScreen extends AbstractScreen {
             } else if (!isButtonUp && !isButtonRight && isButtonDown && !isButtonLeft) {
                 // Move DOWN intent while STAND
                 if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_RIGHT);
 
                 } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_LEFT);
 
                 } else {
                     throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
                 }
+
+                player.getAnimationsController().setPlayMode(AnimationPlayMode.LOOP);
+                player.getAnimationsController().setPlayCompleted(false);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
+
                 player.setPlayerState(PlayerState.RUN);
 
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
@@ -458,7 +495,9 @@ public class TrainingScreen extends AbstractScreen {
 
             } else if (!isButtonUp && !isButtonRight && isButtonDown && isButtonLeft) {
                 // Move DOWN + LEFT intent while STAND
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+                player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_LEFT);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.LEFT);
                 player.setPlayerState(PlayerState.RUN);
 
@@ -470,7 +509,9 @@ public class TrainingScreen extends AbstractScreen {
 
             } else if (!isButtonUp && !isButtonRight && !isButtonDown && isButtonLeft) {
                 // Move LEFT intent while STAND
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+                player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_LEFT);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.LEFT);
                 player.setPlayerState(PlayerState.RUN);
 
@@ -480,7 +521,9 @@ public class TrainingScreen extends AbstractScreen {
 
             } else if (isButtonUp && !isButtonRight && !isButtonDown && isButtonLeft) {
                 // Move UP + LEFT intent while STAND
-                player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+                player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_LEFT);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.LEFT);
                 player.setPlayerState(PlayerState.RUN);
 
@@ -499,14 +542,20 @@ public class TrainingScreen extends AbstractScreen {
                 // Ball KICK intent while RUN
                 if (player.isReadyToKick()) {
                     if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
-                        player.setCurrentAnimationByName(Constants.AnimationName.KICK_RIGHT);
+                        player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.KICK_RIGHT);
 
                     } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
-                        player.setCurrentAnimationByName(Constants.AnimationName.KICK_LEFT);
+                        player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.KICK_LEFT);
 
                     } else {
                         throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
                     }
+
+                    player.getAnimationsController().setPlayMode(AnimationPlayMode.SINGLE);
+                    player.getAnimationsController().setPlayCompleted(false);
+                    player.getAnimationsController().resetCurrentFrameNumber();
+                    player.getAnimationsController().setTicksPassed(0);
+
                     player.setPlayerState(PlayerState.KICK);
                     player.startKick();
 
@@ -528,6 +577,34 @@ public class TrainingScreen extends AbstractScreen {
                     }
                 }
 
+            } else if (isButtonPowerKick) {
+                // Ball POWER KICK intent while RUN
+                if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
+                    // Player is controlling the ball
+                    if (player.isReadyToKick()) {
+                        if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.POWER_KICK_RIGHT);
+
+                        } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.POWER_KICK_LEFT);
+
+                        } else {
+                            throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                        }
+
+                        player.getAnimationsController().setPlayMode(AnimationPlayMode.SINGLE);
+                        player.getAnimationsController().setPlayCompleted(false);
+                        player.getAnimationsController().resetCurrentFrameNumber();
+                        player.getAnimationsController().setTicksPassed(0);
+
+                        player.setPlayerState(PlayerState.POWER_KICK);
+                    }
+
+                } else {
+                    // Player is not controlling the ball
+
+                }
+
             } else if (isButtonUp && !isButtonRight && !isButtonDown && !isButtonLeft) {
                 // Move UP intent while RUN
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
@@ -538,7 +615,9 @@ public class TrainingScreen extends AbstractScreen {
                 // Move UP + RIGHT intent while RUN
                 if (!FaceDirection.RIGHT.equals(player.getFaceDirection())) {
                     player.setFaceDirection(FaceDirection.RIGHT);
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_RIGHT);
+                    player.getAnimationsController().resetCurrentFrameNumber();
+                    player.getAnimationsController().setTicksPassed(0);
                 }
 
                 double nextCenterX = player.getCenterX() + player.getRunSpeed();
@@ -551,7 +630,9 @@ public class TrainingScreen extends AbstractScreen {
                 // Move RIGHT intent while RUN
                 if (!FaceDirection.RIGHT.equals(player.getFaceDirection())) {
                     player.setFaceDirection(FaceDirection.RIGHT);
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_RIGHT);
+                    player.getAnimationsController().resetCurrentFrameNumber();
+                    player.getAnimationsController().setTicksPassed(0);
                 }
 
                 double nextCenterX = player.getCenterX() + player.getRunSpeed();
@@ -562,7 +643,9 @@ public class TrainingScreen extends AbstractScreen {
                 // Move DOWN + RIGHT intent while RUN
                 if (!FaceDirection.RIGHT.equals(player.getFaceDirection())) {
                     player.setFaceDirection(FaceDirection.RIGHT);
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_RIGHT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_RIGHT);
+                    player.getAnimationsController().resetCurrentFrameNumber();
+                    player.getAnimationsController().setTicksPassed(0);
                 }
 
                 double nextCenterX = player.getCenterX() + player.getRunSpeed();
@@ -581,7 +664,9 @@ public class TrainingScreen extends AbstractScreen {
                 // Move DOWN + LEFT intent while RUN
                 if (!FaceDirection.LEFT.equals(player.getFaceDirection())) {
                     player.setFaceDirection(FaceDirection.LEFT);
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_LEFT);
+                    player.getAnimationsController().resetCurrentFrameNumber();
+                    player.getAnimationsController().setTicksPassed(0);
                 }
 
                 double nextCenterX = player.getCenterX() - player.getRunSpeed();
@@ -594,7 +679,9 @@ public class TrainingScreen extends AbstractScreen {
                 // Move LEFT intent while RUN
                 if (!FaceDirection.LEFT.equals(player.getFaceDirection())) {
                     player.setFaceDirection(FaceDirection.LEFT);
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_LEFT);
+                    player.getAnimationsController().resetCurrentFrameNumber();
+                    player.getAnimationsController().setTicksPassed(0);
                 }
 
                 double nextCenterX = player.getCenterX() - player.getRunSpeed();
@@ -605,7 +692,9 @@ public class TrainingScreen extends AbstractScreen {
                 // Move UP + LEFT intent while RUN
                 if (!FaceDirection.LEFT.equals(player.getFaceDirection())) {
                     player.setFaceDirection(FaceDirection.LEFT);
-                    player.setCurrentAnimationByName(Constants.AnimationName.RUN_LEFT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.RUN_LEFT);
+                    player.getAnimationsController().resetCurrentFrameNumber();
+                    player.getAnimationsController().setTicksPassed(0);
                 }
 
                 double nextCenterX = player.getCenterX() - player.getRunSpeed();
@@ -615,21 +704,28 @@ public class TrainingScreen extends AbstractScreen {
                 checkBallControl(player, ball);
 
             } else {
-                // Switch to STAY for other cases
-                if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())) {
-                    player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
-                } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
-                    player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
+                // Switch to STAND for other cases
+                if (Constants.AnimationName.RUN_LEFT.equals(player.getAnimationsController().getCurrentAnimation().getAnimationName())) {
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.STAND_LEFT);
+
+                } else if (Constants.AnimationName.RUN_RIGHT.equals(player.getAnimationsController().getCurrentAnimation().getAnimationName())) {
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.STAND_RIGHT);
                 }
+
+                player.getAnimationsController().setPlayMode(AnimationPlayMode.LOOP);
+                player.getAnimationsController().setPlayCompleted(false);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
+
                 player.setPlayerState(PlayerState.STAND);
                 checkBallControl(player, ball);
 
             }
 
             // Adjust height for running
-            if (Constants.AnimationName.RUN_LEFT.equals(player.getCurrentAnimationName())
-                    || Constants.AnimationName.RUN_RIGHT.equals(player.getCurrentAnimationName())) {
-                int frameNumber = player.getCurrentAnimationFrameNumber();
+            if (Constants.AnimationName.RUN_LEFT.equals(player.getAnimationsController().getCurrentAnimation().getAnimationName())
+                    || Constants.AnimationName.RUN_RIGHT.equals(player.getAnimationsController().getCurrentAnimation().getAnimationName())) {
+                int frameNumber = player.getAnimationsController().getCurrentFrameNumber();
                 if (frameNumber == 0) {
                     player.setCenterZ(2);
                 } else {
@@ -640,15 +736,67 @@ public class TrainingScreen extends AbstractScreen {
             }
 
         } else if (PlayerState.KICK.equals(player.getPlayerState())) {
-            if (!player.isFreezed()) {
+            // Process KICK state
+            // Check if animation is completed - switch to the next animation
+            if (player.getAnimationsController().isPlayCompleted()) {
                 if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
-                    player.setCurrentAnimationByName(Constants.AnimationName.STAND_RIGHT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.STAND_RIGHT);
                 } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
-                    player.setCurrentAnimationByName(Constants.AnimationName.STAND_LEFT);
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.STAND_LEFT);
                 } else {
                     throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
                 }
+
+                player.getAnimationsController().setPlayMode(AnimationPlayMode.LOOP);
+                player.getAnimationsController().setPlayCompleted(false);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
+
                 player.setPlayerState(PlayerState.STAND);
+            }
+
+        } else if (PlayerState.POWER_KICK.equals(player.getPlayerState())) {
+            // Process POWER_KICK state
+            // Check if animation is completed - switch to the next animation
+            if (player.getAnimationsController().isPlayCompleted()) {
+                if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.STAND_RIGHT);
+                } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                    player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.STAND_LEFT);
+                } else {
+                    throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                }
+
+                player.getAnimationsController().setPlayMode(AnimationPlayMode.LOOP);
+                player.getAnimationsController().setPlayCompleted(false);
+                player.getAnimationsController().resetCurrentFrameNumber();
+                player.getAnimationsController().setTicksPassed(0);
+
+                player.setPlayerState(PlayerState.STAND);
+
+                System.out.println("Completed");
+
+            } else {
+                // Animation is not completed
+                int frameNumber = player.getAnimationsController().getCurrentFrameNumber();
+                if (frameNumber == 2) {
+                    // Hit the ball with the last frame
+                    System.out.println("Power kick on ball");
+                    if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+                        ball.setVectorX(0.7);
+                    } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                        ball.setVectorX(-0.7);
+                    } else {
+                        throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                    }
+                    ball.setVectorY(0);
+                    ball.setVectorZ(0.7);
+                    ball.setSpeed(8);
+
+                    player.startKick();
+                }
+
+                System.out.println("Not completed");
 
             }
         }
@@ -660,6 +808,38 @@ public class TrainingScreen extends AbstractScreen {
         player.update();
 
         Console.addMessage("Player center(" + player.getCenterX() + "," + player.getCenterY() + "," + player.getCenterZ() + ") state=" + player.getPlayerState());
+    }
+
+    public void updateCamera(VirtualCamera camera, VirtualRectangle cameraMovementBounds, VirtualObject target) {
+        // Check if we need to adjust camera position according to target position
+        if (camera.getMovementBounds().getX() > target.getCenterX()) {
+            double delta = target.getCenterX() - camera.getMovementBounds().getX();
+            camera.addToX(delta);
+        }
+        if (camera.getMovementBounds().getX() + camera.getMovementBounds().getWidth() < target.getCenterX()) {
+            double delta = target.getCenterX() - camera.getMovementBounds().getX() - camera.getMovementBounds().getWidth();
+            camera.addToX(delta);
+        }
+        if (camera.getMovementBounds().getY() > target.getCenterY()) {
+            double delta = target.getCenterY() - camera.getMovementBounds().getY();
+            camera.addToY(delta);
+        }
+        if (camera.getMovementBounds().getY() + camera.getMovementBounds().getHeight() < target.getCenterY()) {
+            double delta = target.getCenterY() - camera.getMovementBounds().getY() - camera.getMovementBounds().getHeight();
+            camera.addToY(delta);
+        }
+
+        // Check if camera is out of world bounds
+        if (camera.getX() < cameraMovementBounds.getX()) {
+            camera.setX(cameraMovementBounds.getX());
+        } else if (camera.getX() + camera.getWidth() >= cameraMovementBounds.getX() + cameraMovementBounds.getWidth()) {
+            camera.setX(cameraMovementBounds.getX() + cameraMovementBounds.getWidth() - camera.getWidth() - 1);
+        }
+        if (camera.getY() < cameraMovementBounds.getY()) {
+            camera.setY(cameraMovementBounds.getY());
+        } else if (camera.getY() + camera.getHeight() >= cameraMovementBounds.getY() + cameraMovementBounds.getHeight()) {
+            camera.setY(cameraMovementBounds.getY() + cameraMovementBounds.getHeight() - camera.getHeight() - 1);
+        }
     }
 
     private void checkBallControl(Player player, Ball ball) {

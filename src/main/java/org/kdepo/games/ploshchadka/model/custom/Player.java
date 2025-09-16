@@ -5,20 +5,18 @@ import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.Animation;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
+import org.kdepo.games.ploshchadka.model.base.animation.AnimationsController;
 import org.kdepo.games.ploshchadka.utils.FileUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Player extends DrawableObject {
 
     private double runSpeed;
     private double dashSpeed;
 
-    private final Map<String, Animation> animationMap;
-    private Animation currentAnimation;
+    private AnimationsController animationsController;
 
     private FaceDirection faceDirection;
     private PlayerState playerState;
@@ -47,7 +45,7 @@ public class Player extends DrawableObject {
         freezeTicks = 0;
 
         // Rendering parameters
-        animationMap = new HashMap<>();
+        animationsController = new AnimationsController();
 
         // Prepare frames images
         BufferedImage imageFrame01 = FileUtils.loadImage("frame01.png");
@@ -71,37 +69,51 @@ public class Player extends DrawableObject {
         AnimationFrame[] standRightFrames = new AnimationFrame[1];
         standRightFrames[0] = new AnimationFrame(0, imageFrame01, 999);
         Animation standRightAnimation = new Animation(Constants.AnimationName.STAND_RIGHT, standRightFrames, 0);
-        animationMap.put(Constants.AnimationName.STAND_RIGHT, standRightAnimation);
+        animationsController.addAnimation(standRightAnimation);
 
         AnimationFrame[] runRightFrames = new AnimationFrame[2];
         runRightFrames[0] = new AnimationFrame(0, imageFrame02, 8);
         runRightFrames[1] = new AnimationFrame(1, imageFrame01, 8);
         Animation runRightAnimation = new Animation(Constants.AnimationName.RUN_RIGHT, runRightFrames, 0);
-        animationMap.put(Constants.AnimationName.RUN_RIGHT, runRightAnimation);
+        animationsController.addAnimation(runRightAnimation);
 
         AnimationFrame[] standLeftFrames = new AnimationFrame[1];
         standLeftFrames[0] = new AnimationFrame(0, imageFrame01m, 999);
         Animation standLeftAnimation = new Animation(Constants.AnimationName.STAND_LEFT, standLeftFrames, 0);
-        animationMap.put(Constants.AnimationName.STAND_LEFT, standLeftAnimation);
+        animationsController.addAnimation(standLeftAnimation);
 
         AnimationFrame[] runLeftFrames = new AnimationFrame[2];
         runLeftFrames[0] = new AnimationFrame(0, imageFrame02m, 8);
         runLeftFrames[1] = new AnimationFrame(1, imageFrame01m, 8);
         Animation runLeftAnimation = new Animation(Constants.AnimationName.RUN_LEFT, runLeftFrames, 0);
-        animationMap.put(Constants.AnimationName.RUN_LEFT, runLeftAnimation);
+        animationsController.addAnimation(runLeftAnimation);
 
         AnimationFrame[] kickRightFrames = new AnimationFrame[1];
-        kickRightFrames[0] = new AnimationFrame(0, imageFrame03, 999);
+        kickRightFrames[0] = new AnimationFrame(0, imageFrame03, 12);
         Animation kickRightAnimation = new Animation(Constants.AnimationName.KICK_RIGHT, kickRightFrames, 0);
-        animationMap.put(Constants.AnimationName.KICK_RIGHT, kickRightAnimation);
+        animationsController.addAnimation(kickRightAnimation);
 
         AnimationFrame[] kickLeftFrames = new AnimationFrame[1];
-        kickLeftFrames[0] = new AnimationFrame(0, imageFrame03m, 999);
+        kickLeftFrames[0] = new AnimationFrame(0, imageFrame03m, 12);
         Animation kickLeftAnimation = new Animation(Constants.AnimationName.KICK_LEFT, kickLeftFrames, 0);
-        animationMap.put(Constants.AnimationName.KICK_LEFT, kickLeftAnimation);
+        animationsController.addAnimation(kickLeftAnimation);
+
+        AnimationFrame[] powerKickRightFrames = new AnimationFrame[3];
+        powerKickRightFrames[0] = new AnimationFrame(0, imageFrame04, 6);
+        powerKickRightFrames[1] = new AnimationFrame(1, imageFrame05, 6);
+        powerKickRightFrames[2] = new AnimationFrame(2, imageFrame06, 6);
+        Animation powerKickRightAnimation = new Animation(Constants.AnimationName.POWER_KICK_RIGHT, powerKickRightFrames, 0);
+        animationsController.addAnimation(powerKickRightAnimation);
+
+        AnimationFrame[] powerKickLeftFrames = new AnimationFrame[3];
+        powerKickLeftFrames[0] = new AnimationFrame(0, imageFrame04m, 6);
+        powerKickLeftFrames[1] = new AnimationFrame(1, imageFrame05m, 6);
+        powerKickLeftFrames[2] = new AnimationFrame(2, imageFrame06m, 6);
+        Animation powerKickLeftAnimation = new Animation(Constants.AnimationName.POWER_KICK_LEFT, powerKickLeftFrames, 0);
+        animationsController.addAnimation(powerKickLeftAnimation);
 
         // Resolve animation based on state parameters
-        currentAnimation = standRightAnimation;
+        animationsController.setCurrentAnimation(standRightAnimation);
 
         // Virtual position parameters
         this.centerX = -50;
@@ -109,10 +121,10 @@ public class Player extends DrawableObject {
         this.centerZ = 0;
 
         // Sprite position based on virtual position parameters
-        this.x = centerX - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
-        this.y = centerY - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
-        this.width = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth();
-        this.height = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight();
+        this.x = centerX - animationsController.getCurrentAnimation().getAnimationFrames()[animationsController.getCurrentAnimation().getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
+        this.y = centerY - animationsController.getCurrentAnimation().getAnimationFrames()[animationsController.getCurrentAnimation().getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
+        this.width = animationsController.getCurrentAnimation().getAnimationFrames()[animationsController.getCurrentAnimation().getCurrentFrameNumber()].getFrameImage().getWidth();
+        this.height = animationsController.getCurrentAnimation().getAnimationFrames()[animationsController.getCurrentAnimation().getCurrentFrameNumber()].getFrameImage().getHeight();
 
         isControllingTheBall = false;
         radius = 16;
@@ -121,13 +133,21 @@ public class Player extends DrawableObject {
     @Override
     public void setCenterX(double centerX) {
         this.centerX = centerX;
-        this.x = centerX - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
+        this.x = centerX - animationsController.getCurrentAnimation().getAnimationFrames()[animationsController.getCurrentAnimation().getCurrentFrameNumber()].getFrameImage().getWidth() * 1.0 / 2;
     }
 
     @Override
     public void setCenterY(double centerY) {
         this.centerY = centerY;
-        this.y = centerY - currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
+        this.y = centerY - animationsController.getCurrentAnimation().getAnimationFrames()[animationsController.getCurrentAnimation().getCurrentFrameNumber()].getFrameImage().getHeight() - centerZ;
+    }
+
+    public AnimationsController getAnimationsController() {
+        return animationsController;
+    }
+
+    public void setAnimationsController(AnimationsController animationsController) {
+        this.animationsController = animationsController;
     }
 
     public double getRunSpeed() {
@@ -136,24 +156,6 @@ public class Player extends DrawableObject {
 
     public void setRunSpeed(double runSpeed) {
         this.runSpeed = runSpeed;
-    }
-
-    public String getCurrentAnimationName() {
-        return currentAnimation.getAnimationName();
-    }
-
-    public void setCurrentAnimationByName(String animationName) {
-        currentAnimation = animationMap.get(animationName);
-        if (currentAnimation == null) {
-            throw new RuntimeException("Animation not found: " + animationName);
-        } else {
-            System.out.println("current animation set to " + currentAnimation.getAnimationName());
-        }
-        currentAnimation.reset();
-    }
-
-    public int getCurrentAnimationFrameNumber() {
-        return currentAnimation.getCurrentFrameNumber();
     }
 
     public FaceDirection getFaceDirection() {
@@ -173,11 +175,7 @@ public class Player extends DrawableObject {
     }
 
     public void animate() {
-        if (currentAnimation.isFrameDisplayCompleted()) {
-            currentAnimation.nextFrame();
-        } else {
-            currentAnimation.update();
-        }
+        animationsController.animate();
     }
 
     public void update() {
@@ -198,7 +196,7 @@ public class Player extends DrawableObject {
         double screenOffsetX = camera.getScreenOffsetX(this.x);
         double screenOffsetY = camera.getScreenOffsetY(this.y) - centerZ;
 
-        BufferedImage frameImage = currentAnimation.getAnimationFrames()[currentAnimation.getCurrentFrameNumber()].getFrameImage();
+        BufferedImage frameImage = animationsController.getCurrentAnimationFrameImage();
 
         g.drawImage(
                 frameImage,
