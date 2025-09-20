@@ -11,8 +11,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 public class FontUtils {
@@ -20,18 +20,9 @@ public class FontUtils {
     public static Font load(String pathToXml, String pathToPng) {
         System.out.println("Loading font with config=" + pathToXml + " and image=" + pathToPng);
 
-        Font result = null;
-
         // Check that path to file is provided
         if (pathToXml == null || pathToXml.isEmpty()) {
             System.out.println("Cannot load xml config because path to file is not provided");
-            return null;
-        }
-
-        // Check for file existence
-        File file = new File(pathToXml);
-        if (!file.exists() || file.isDirectory()) {
-            System.out.println("Cannot load xml config because path to file is not exists or directory: " + pathToXml);
             return null;
         }
 
@@ -47,9 +38,10 @@ public class FontUtils {
         }
 
         // Load resources definitions
-        Document xmlDocument = null;
+        Document xmlDocument;
         try {
-            xmlDocument = db.parse(pathToXml);
+            InputStream inputStream = FontUtils.class.getClassLoader().getResourceAsStream(pathToXml);
+            xmlDocument = db.parse(inputStream);
         } catch (IOException | SAXException e) {
             System.out.println("Cannot load parse xml config: " + pathToXml);
             e.printStackTrace();

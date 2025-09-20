@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Font {
 
-    private static final int DEFAULT_SPACE = 1;
+    private static final int DEFAULT_SPACE = 0;
 
     /**
      * Font name
