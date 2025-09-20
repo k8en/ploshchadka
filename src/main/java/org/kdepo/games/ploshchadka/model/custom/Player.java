@@ -216,17 +216,12 @@ public class Player extends DrawableObject {
         }
     }
 
-    public boolean isFreezed() {
-        return freezeTicks > 0;
-    }
-
     public boolean isReadyToKick() {
         return kickReadiness == 100d;
     }
 
     public void startKick() {
         kickReadiness = 0;
-        freezeTicks = 10;
     }
 
     public boolean isControllingTheBall() {

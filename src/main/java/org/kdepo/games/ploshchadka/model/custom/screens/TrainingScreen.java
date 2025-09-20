@@ -10,7 +10,9 @@ import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
 import org.kdepo.games.ploshchadka.model.custom.Ball;
+import org.kdepo.games.ploshchadka.model.custom.CrossbarSegment;
 import org.kdepo.games.ploshchadka.model.custom.FaceDirection;
+import org.kdepo.games.ploshchadka.model.custom.Goalpost;
 import org.kdepo.games.ploshchadka.model.custom.Ground;
 import org.kdepo.games.ploshchadka.model.custom.Player;
 import org.kdepo.games.ploshchadka.model.custom.PlayerState;
@@ -40,6 +42,15 @@ public class TrainingScreen extends AbstractScreen {
     private double ballDistanceForSpin;
 
     private Ground ground;
+
+    private Goalpost goalpost1;
+    private CrossbarSegment crossbarSegment1;
+    private CrossbarSegment crossbarSegment2a;
+    private CrossbarSegment crossbarSegment2b;
+    private CrossbarSegment crossbarSegment2c;
+    private CrossbarSegment crossbarSegment3;
+    private Goalpost goalpost2;
+
     private Player player;
 
     private boolean isButtonUp;
@@ -64,6 +75,15 @@ public class TrainingScreen extends AbstractScreen {
         friction = 0.02d;
 
         ground = new Ground();
+
+        goalpost1 = new Goalpost(965, -59);
+        crossbarSegment1 = new CrossbarSegment(974, -38, CrossbarSegment.SEGMENT_TOP);
+        crossbarSegment2a = new CrossbarSegment(974, -14, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegment2b = new CrossbarSegment(974, 10, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegment2c = new CrossbarSegment(974, 34, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegment3 = new CrossbarSegment(974, 58, CrossbarSegment.SEGMENT_BOTTOM);
+        goalpost2 = new Goalpost(965, 59);
+
         player = new Player();
 
         camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
@@ -107,10 +127,17 @@ public class TrainingScreen extends AbstractScreen {
         renderList.clear();
         renderList.add(player);
         renderList.add(ball);
+        renderList.add(goalpost1);
+        renderList.add(crossbarSegment1);
+        renderList.add(crossbarSegment2a);
+        renderList.add(crossbarSegment2b);
+        renderList.add(crossbarSegment2c);
+        renderList.add(crossbarSegment3);
+        renderList.add(goalpost2);
         renderList.sort(Comparator.comparing(VirtualObject::getCenterY));
 
         // Output debug information
-        Console.addMessage("Camera: x=" + camera.getX() + ", y=" + camera.getY() + ", width=" + camera.getWidth() + ", height=" + camera.getHeight());
+        //Console.addMessage("Camera: x=" + camera.getX() + ", y=" + camera.getY() + ", width=" + camera.getWidth() + ", height=" + camera.getHeight());
     }
 
     @Override
