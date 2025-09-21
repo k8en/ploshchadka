@@ -76,13 +76,13 @@ public class TrainingScreen extends AbstractScreen {
 
         ground = new Ground();
 
-        goalpost1 = new Goalpost(965, -59);
-        crossbarSegment1 = new CrossbarSegment(974, -38, CrossbarSegment.SEGMENT_TOP);
-        crossbarSegment2a = new CrossbarSegment(974, -14, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegment2b = new CrossbarSegment(974, 10, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegment2c = new CrossbarSegment(974, 34, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegment3 = new CrossbarSegment(974, 58, CrossbarSegment.SEGMENT_BOTTOM);
-        goalpost2 = new Goalpost(965, 59);
+        goalpost1 = new Goalpost(965, -69);
+        crossbarSegment1 = new CrossbarSegment(974, -48, CrossbarSegment.SEGMENT_TOP);
+        crossbarSegment2a = new CrossbarSegment(974, -24, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegment2b = new CrossbarSegment(974, 0, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegment2c = new CrossbarSegment(974, 24, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegment3 = new CrossbarSegment(974, 48, CrossbarSegment.SEGMENT_BOTTOM);
+        goalpost2 = new Goalpost(965, 49);
 
         player = new Player();
 
