@@ -56,6 +56,15 @@ public class TileMap {
 
     public void setX(double x) {
         this.x = x;
+
+        for (int row = 0; row < tiles.length; row++) {
+            for (int column = 0; column < tiles[0].length; column++) {
+                Tile tile = tiles[row][column];
+                if (tile != null) {
+                    tile.setX(x + column * tileWidth);
+                }
+            }
+        }
     }
 
     public double getY() {
@@ -64,6 +73,15 @@ public class TileMap {
 
     public void setY(double y) {
         this.y = y;
+
+        for (int row = 0; row < tiles.length; row++) {
+            for (int column = 0; column < tiles[0].length; column++) {
+                Tile tile = tiles[row][column];
+                if (tile != null) {
+                    tile.setY(y + row * tileHeight);
+                }
+            }
+        }
     }
 
     public int getTileWidth() {
@@ -142,6 +160,9 @@ public class TileMap {
         for (int row = 0; row < tileIds.length; row++) {
             for (int column = 0; column < tileIds[0].length; column++) {
                 Tile tile = new Tile();
+                tile.setColumn(column);
+                tile.setRow(row);
+                tile.setTileId(tileIds[row][column]);
                 tile.setImage(imageMap.get(tileIds[row][column]));
                 tiles[row][column] = tile;
             }
