@@ -3,18 +3,20 @@ package org.kdepo.games.ploshchadka.model.custom;
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
+import org.kdepo.games.ploshchadka.model.base.geometry.Sphere;
+import org.kdepo.games.ploshchadka.model.base.geometry.Vector3D;
 import org.kdepo.games.ploshchadka.utils.FileUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.text.DecimalFormat;
 
 public class Ball extends DrawableObject {
 
-    private int radius;
-    private double vectorX;
-    private double vectorY;
-    private double vectorZ;
-    private double speed;
+    private final Sphere sphere;
+
+    private Vector3D movementVector;
+    private double movementSpeed;
 
     private final AnimationFrame[] animationFrames;
     private int currentFrameNumber;
@@ -22,6 +24,9 @@ public class Ball extends DrawableObject {
     private final BufferedImage shadowImage;
 
     private Player controlledBy;
+
+    private final StringBuilder debugInfoBuilder;
+    private final DecimalFormat decimalFormat;
 
     public Ball() {
         // Rendering parameters
@@ -46,7 +51,7 @@ public class Ball extends DrawableObject {
         this.centerX = 0;
         this.centerY = 0;
         this.centerZ = 0;
-        radius = 14;
+        sphere = new Sphere(this.centerX, this.centerY, 14, 14);
 
         // Sprite position based on virtual position parameters
         this.x = centerX - animationFrames[currentFrameNumber].getFrameImage().getWidth() * 1.0 / 2;
@@ -55,64 +60,48 @@ public class Ball extends DrawableObject {
         this.height = animationFrames[currentFrameNumber].getFrameImage().getHeight();
 
         // Movement parameters
-        vectorX = 0.0d;
-        vectorY = 0.0d;
-        vectorZ = 0.0d;
-        speed = 0.0d;
+        movementVector = new Vector3D(0.0d, 0.0d, 0.0d);
+        movementSpeed = 0.0d;
 
-        System.out.println("Ball initialized with center at (" + centerX + "," + centerY + "," + centerZ + ")");
+        // For debug purposes
+        debugInfoBuilder = new StringBuilder();
+        decimalFormat = new DecimalFormat("#0.00");
+
+        System.out.println("Ball initialized with center at (" + centerX + "," + centerY + "," + centerZ + ") " + sphere);
     }
 
     @Override
     public void setCenterX(double centerX) {
         this.centerX = centerX;
         this.x = centerX - animationFrames[currentFrameNumber].getFrameImage().getWidth() * 1.0 / 2;
+        sphere.setX(centerX);
     }
 
     @Override
     public void setCenterY(double centerY) {
         this.centerY = centerY;
         this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
+        sphere.setY(centerY);
     }
 
-    public int getRadius() {
-        return radius;
+    public Sphere getSphere() {
+        return sphere;
     }
 
-    public void setRadius(int radius) {
-        this.radius = radius;
+    public Vector3D getMovementVector() {
+        return movementVector;
     }
 
-    public double getVectorX() {
-        return vectorX;
+    public void setMovementVector(Vector3D movementVector) {
+        this.movementVector = movementVector;
     }
 
-    public void setVectorX(double vectorX) {
-        this.vectorX = vectorX;
+    public double getMovementSpeed() {
+        return movementSpeed;
     }
 
-    public double getVectorY() {
-        return vectorY;
-    }
-
-    public void setVectorY(double vectorY) {
-        this.vectorY = vectorY;
-    }
-
-    public double getVectorZ() {
-        return vectorZ;
-    }
-
-    public void setVectorZ(double vectorZ) {
-        this.vectorZ = vectorZ;
-    }
-
-    public double getSpeed() {
-        return speed;
-    }
-
-    public void setSpeed(double speed) {
-        this.speed = speed;
+    public void setMovementSpeed(double movementSpeed) {
+        this.movementSpeed = movementSpeed;
     }
 
     public void setNextFrame() {
@@ -169,7 +158,28 @@ public class Ball extends DrawableObject {
             double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY);
 
             g.setColor(Color.RED);
-            g.drawOval((int) screenOffsetCenterX - radius, (int) screenOffsetCenterY - radius, radius * 2, radius * 2);
+            g.drawOval(
+                    (int) (screenOffsetCenterX - sphere.getRadius()),
+                    (int) (screenOffsetCenterY - sphere.getRadius()),
+                    (int) (sphere.getRadius() * 2),
+                    (int) (sphere.getRadius() * 2)
+            );
         }
+    }
+
+    public String getDebugInfo() {
+        debugInfoBuilder.setLength(0);
+
+        debugInfoBuilder.append("Ball ");
+        debugInfoBuilder.append(decimalFormat.format(centerX));
+        debugInfoBuilder.append(", ").append(decimalFormat.format(centerY));
+        debugInfoBuilder.append(", ").append(decimalFormat.format(centerZ));
+
+        debugInfoBuilder.append(" sphere ");
+        debugInfoBuilder.append(decimalFormat.format(sphere.getX()));
+        debugInfoBuilder.append(", ").append(decimalFormat.format(sphere.getY()));
+        debugInfoBuilder.append(", ").append(decimalFormat.format(sphere.getX()));
+
+        return debugInfoBuilder.toString();
     }
 }

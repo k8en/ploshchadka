@@ -213,6 +213,7 @@ public class Player extends DrawableObject {
 
             g.setColor(Color.RED);
             g.drawOval((int) screenOffsetCenterX - radius, (int) screenOffsetCenterY - radius, radius * 2, radius * 2);
+            g.drawLine((int) screenOffsetCenterX, (int) screenOffsetCenterY - 64, (int) screenOffsetCenterX, (int) screenOffsetCenterY);
         }
     }
 

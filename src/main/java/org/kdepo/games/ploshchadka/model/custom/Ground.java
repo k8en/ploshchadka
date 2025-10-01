@@ -20,6 +20,8 @@ public class Ground {
 
         tileMap.setX(-tileMap.getMapWidth() / 2);
         tileMap.setY(-tileMap.getMapHeight() / 2 - 32);
+
+        System.out.println("Ground top left at " + tileMap.getX() + " " + tileMap.getY() + " width = " + tileMap.getMapWidth() + " height = " + tileMap.getMapHeight());
     }
 
     public double getX() {

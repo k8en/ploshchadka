@@ -1,5 +1,6 @@
 package org.kdepo.games.ploshchadka;
 
+// "mvn clean compile assembly:single" to get executable jar
 public class MainClass {
 
     public static void main(String[] args) {

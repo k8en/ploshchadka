@@ -25,6 +25,7 @@ public class Goalpost extends DrawableObject {
         this.y = centerY - image.getHeight() - centerZ;
         this.width = image.getWidth();
         this.height = image.getHeight();
+        System.out.println("Top left " + x + " " + y + " bottom right " + (x + width) + " " + (y + height));
     }
 
     @Override

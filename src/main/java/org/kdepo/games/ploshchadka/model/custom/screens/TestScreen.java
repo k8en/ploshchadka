@@ -28,33 +28,33 @@ public class TestScreen extends AbstractScreen {
         double nextX;
         double nextY;
         for (Ball ball : ballList) {
-            nextX = ball.getCenterX() + ball.getVectorX() * ball.getSpeed();
-            nextY = ball.getCenterY() + ball.getVectorY() * ball.getSpeed();
+            nextX = ball.getCenterX() + ball.getMovementVector().getX() * ball.getMovementSpeed();
+            nextY = ball.getCenterY() + ball.getMovementVector().getY() * ball.getMovementSpeed();
 
             if (nextX < 0) {
                 nextX = 0;
-                double vectorX = ball.getVectorX();
+                double vectorX = ball.getMovementVector().getX();
                 vectorX = -vectorX;
-                ball.setVectorX(vectorX);
+                ball.getMovementVector().setX(vectorX);
             }
             if (nextX > 1024) {
                 nextX = 1024;
-                double vectorX = ball.getVectorX();
+                double vectorX = ball.getMovementVector().getX();
                 vectorX = -vectorX;
-                ball.setVectorX(vectorX);
+                ball.getMovementVector().setX(vectorX);
             }
 
             if (nextY < 0) {
                 nextY = 0;
-                double vectorY = ball.getVectorY();
+                double vectorY = ball.getMovementVector().getY();
                 vectorY = -vectorY;
-                ball.setVectorY(vectorY);
+                ball.getMovementVector().setY(vectorY);
             }
             if (nextY > 960) {
                 nextY = 960;
-                double vectorY = ball.getVectorY();
+                double vectorY = ball.getMovementVector().getY();
                 vectorY = -vectorY;
-                ball.setVectorY(vectorY);
+                ball.getMovementVector().setY(vectorY);
             }
 
             ball.setCenterX(nextX);
@@ -72,8 +72,8 @@ public class TestScreen extends AbstractScreen {
             g.drawOval(
                     (int) ball.getCenterX(),
                     (int) ball.getCenterY(),
-                    ball.getRadius(),
-                    ball.getRadius()
+                    (int) ball.getSphere().getRadius(),
+                    (int) ball.getSphere().getRadius()
             );
         }
     }
@@ -96,14 +96,14 @@ public class TestScreen extends AbstractScreen {
 
         ball.setCenterX(e.getX());
         ball.setCenterY(e.getY());
-        ball.setRadius(radius);
-        ball.setSpeed(radius);
+//        ball.setRadius(radius);
+        ball.setMovementSpeed(radius);
 
         int direction = random.nextInt(360);
-        ball.setVectorX(Math.cos(direction));
-        ball.setVectorY(Math.sin(direction));
+        ball.getMovementVector().setX(Math.cos(direction));
+        ball.getMovementVector().setY(Math.sin(direction));
 
-        ball.setSpeed(random.nextDouble());
+        ball.setMovementSpeed(random.nextDouble());
 
         ballList.add(ball);
         System.out.println("Clicked");
