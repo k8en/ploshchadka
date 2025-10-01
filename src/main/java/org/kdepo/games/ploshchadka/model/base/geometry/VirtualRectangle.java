@@ -5,16 +5,23 @@ import java.util.Objects;
 public class VirtualRectangle {
 
     /**
-     * Top left corner
+     * X coordinate of the top left corner of rectangle
      */
     protected double x;
 
     /**
-     * Top left corner
+     * Y coordinate of the top left corner of rectangle
      */
     protected double y;
 
+    /**
+     * Rectangle width
+     */
     protected double width;
+
+    /**
+     * Rectangle height
+     */
     protected double height;
 
     public VirtualRectangle() {

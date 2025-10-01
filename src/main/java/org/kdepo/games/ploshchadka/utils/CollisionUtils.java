@@ -73,7 +73,7 @@ public class CollisionUtils {
                 );
             } else if (sphere.getY() > polygon.getD().getY()
                     && sphere.getZ() < polygon.getD().getZ()) {
-                // Sector 6
+                // Section 6
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getD().getX(), polygon.getD().getY(), polygon.getD().getZ()
@@ -81,20 +81,20 @@ public class CollisionUtils {
             } else if (sphere.getZ() <= polygon.getA().getZ()
                     && sphere.getZ() >= polygon.getD().getZ()
                     && sphere.getY() > polygon.getA().getY()) {
-                // Sector 7
+                // Section 7
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getA().getX(), polygon.getA().getY(), sphere.getZ()
                 );
             } else if (sphere.getY() > polygon.getA().getY()
                     && sphere.getZ() > polygon.getA().getZ()) {
-                // Sector 8
+                // Section 8
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getA().getX(), polygon.getA().getY(), polygon.getA().getZ()
                 );
             } else {
-                throw new RuntimeException("Sector is not resolved for " + sphere + " and " + polygon);
+                throw new RuntimeException("Section is not resolved for " + sphere + " and " + polygon);
             }
 
             return sphereToPlaneDistance <= sphere.getRadius();
@@ -148,7 +148,7 @@ public class CollisionUtils {
                 );
             } else if (sphere.getX() < polygon.getD().getX()
                     && sphere.getZ() < polygon.getD().getZ()) {
-                // Sector 6
+                // Section 6
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getD().getX(), polygon.getD().getY(), polygon.getD().getZ()
@@ -156,20 +156,20 @@ public class CollisionUtils {
             } else if (sphere.getZ() <= polygon.getA().getZ()
                     && sphere.getZ() >= polygon.getD().getZ()
                     && sphere.getX() < polygon.getA().getX()) {
-                // Sector 7
+                // Section 7
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getA().getX(), polygon.getA().getY(), sphere.getZ()
                 );
             } else if (sphere.getX() < polygon.getA().getX()
                     && sphere.getZ() > polygon.getA().getZ()) {
-                // Sector 8
+                // Section 8
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getA().getX(), polygon.getA().getY(), polygon.getA().getZ()
                 );
             } else {
-                throw new RuntimeException("Sector is not resolved for " + sphere + " and " + polygon);
+                throw new RuntimeException("Section is not resolved for " + sphere + " and " + polygon);
             }
 
             return sphereToPlaneDistance <= sphere.getRadius();
@@ -223,7 +223,7 @@ public class CollisionUtils {
                 );
             } else if (sphere.getX() < polygon.getD().getX()
                     && sphere.getY() > polygon.getD().getY()) {
-                // Sector 6
+                // Section 6
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getD().getX(), polygon.getD().getY(), polygon.getD().getZ()
@@ -231,20 +231,20 @@ public class CollisionUtils {
             } else if (sphere.getY() >= polygon.getA().getY()
                     && sphere.getY() <= polygon.getD().getY()
                     && sphere.getX() < polygon.getA().getX()) {
-                // Sector 7
+                // Section 7
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getA().getX(), sphere.getY(), polygon.getA().getZ()
                 );
             } else if (sphere.getX() < polygon.getA().getX()
                     && sphere.getY() < polygon.getA().getY()) {
-                // Sector 8
+                // Section 8
                 sphereToPlaneDistance = MathUtils.getDistance3D(
                         sphere.getX(), sphere.getY(), sphere.getZ(),
                         polygon.getA().getX(), polygon.getA().getY(), polygon.getA().getZ()
                 );
             } else {
-                throw new RuntimeException("Sector is not resolved for " + sphere + " and " + polygon);
+                throw new RuntimeException("Section is not resolved for " + sphere + " and " + polygon);
             }
 
             return sphereToPlaneDistance <= sphere.getRadius();

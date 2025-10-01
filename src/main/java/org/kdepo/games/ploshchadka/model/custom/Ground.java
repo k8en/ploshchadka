@@ -15,8 +15,8 @@ public class Ground {
 
         tileMap.setTileWidth(32);
         tileMap.setTileHeight(32);
-        tileMap.setMapWidth(32 * tileMap.getTiles()[0].length);
-        tileMap.setMapHeight(32 * tileMap.getTiles().length);
+        tileMap.setMapWidth(tileMap.getTileWidth() * tileMap.getTiles()[0].length);
+        tileMap.setMapHeight(tileMap.getTileHeight() * tileMap.getTiles().length);
 
         tileMap.setX(-tileMap.getMapWidth() / 2);
         tileMap.setY(-tileMap.getMapHeight() / 2 - 32);

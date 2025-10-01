@@ -4,6 +4,9 @@ import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 
 public class VirtualObject extends VirtualRectangle {
 
+    /**
+     * Should be unique object identifier
+     */
     protected int id;
 
     /**

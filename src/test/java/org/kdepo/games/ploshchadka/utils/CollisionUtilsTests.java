@@ -899,4 +899,17 @@ public class CollisionUtilsTests {
         Assertions.assertFalse(CollisionUtils.intersects(new Sphere(3, 3, -3, 1), polygonZAxis));
     }
 
+    @Test
+    void sphereToOrthogonalPolygonIntersection() {
+        OrthogonalPolygon polygonAxis = new OrthogonalPolygon(
+                new Point3D(928.0, 60.0, 138.0),
+                new Point3D(1002.0, 60.0, 138.0),
+                new Point3D(1002.0, 60.0, 0.0),
+                new Point3D(928.0, 60.0, 0.0)
+        );
+
+        Assertions.assertEquals(OrthogonalPolygon.Y_AXIS, polygonAxis.getOrthogonalAxis());
+        Assertions.assertFalse(CollisionUtils.intersects(new Sphere(930.0371410967371, 54.58065293274879, 14.0, 14.0), polygonAxis));
+    }
+
 }

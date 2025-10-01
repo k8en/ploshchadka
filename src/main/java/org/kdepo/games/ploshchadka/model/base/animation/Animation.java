@@ -11,6 +11,7 @@ public class Animation {
     private int ticksPassed;
 
     public Animation() {
+        currentFrameNumber = 0;
         ticksPassed = 0;
     }
 

@@ -29,8 +29,14 @@ public class MathUtils {
 
     public static Vector3D getVector3DNormalized(Vector3D v) {
         double length = Math.sqrt(v.getX() * v.getX() + v.getY() * v.getY() + v.getZ() * v.getZ());
-        if (length == 0) return v;
+        if (length == 0) {
+            return v;
+        }
         return new Vector3D(v.getX() / length, v.getY() / length, v.getZ() / length);
+    }
+
+    public static double dot(Vector3D a, Vector3D b) {
+        return a.getX() * b.getX() + a.getY() * b.getY() + a.getZ() * b.getZ();
     }
 
 }

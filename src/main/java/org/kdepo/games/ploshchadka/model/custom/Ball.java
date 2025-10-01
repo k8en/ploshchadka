@@ -13,22 +13,27 @@ import java.text.DecimalFormat;
 
 public class Ball extends DrawableObject {
 
+    // Ball geometry
     private final Sphere sphere;
 
+    // Ball movement
     private Vector3D movementVector;
     private double movementSpeed;
 
+    // Ball rendering
     private final AnimationFrame[] animationFrames;
     private int currentFrameNumber;
 
+    // Ball shadow
     private final BufferedImage shadowImage;
 
     private Player controlledBy;
 
+    // Ball debug
     private final StringBuilder debugInfoBuilder;
     private final DecimalFormat decimalFormat;
 
-    public Ball() {
+    public Ball(double centerX, double centerY, double centerZ, double radius) {
         // Rendering parameters
         BufferedImage ballSprites = FileUtils.loadImage("ball.png");
         shadowImage = FileUtils.loadImage("shadow.png");
@@ -48,14 +53,14 @@ public class Ball extends DrawableObject {
         currentFrameNumber = 0;
 
         // Virtual position parameters
-        this.centerX = 0;
-        this.centerY = 0;
-        this.centerZ = 0;
-        sphere = new Sphere(this.centerX, this.centerY, 14, 14);
+        this.centerX = centerX;
+        this.centerY = centerY;
+        this.centerZ = centerZ;
+        sphere = new Sphere(this.centerX, this.centerY, this.centerZ, radius);
 
         // Sprite position based on virtual position parameters
         this.x = centerX - animationFrames[currentFrameNumber].getFrameImage().getWidth() * 1.0 / 2;
-        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
+        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - sphere.getRadius();
         this.width = animationFrames[currentFrameNumber].getFrameImage().getWidth();
         this.height = animationFrames[currentFrameNumber].getFrameImage().getHeight();
 
@@ -72,16 +77,35 @@ public class Ball extends DrawableObject {
 
     @Override
     public void setCenterX(double centerX) {
-        this.centerX = centerX;
-        this.x = centerX - animationFrames[currentFrameNumber].getFrameImage().getWidth() * 1.0 / 2;
+        super.setCenterX(centerX);
+
+        // Set ball geometry center
         sphere.setX(centerX);
+
+        // Adjust sprite rendering position
+        this.x = centerX - animationFrames[currentFrameNumber].getFrameImage().getWidth() * 1.0 / 2;
     }
 
     @Override
     public void setCenterY(double centerY) {
-        this.centerY = centerY;
-        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
+        super.setCenterY(centerY);
+
+        // Set ball geometry center
         sphere.setY(centerY);
+
+        // Adjust sprite rendering position
+        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
+    }
+
+    @Override
+    public void setCenterZ(double centerZ) {
+        super.setCenterZ(centerZ);
+
+        // Set ball geometry center
+        sphere.setZ(centerZ);
+
+        // Adjust sprite rendering position
+        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
     }
 
     public Sphere getSphere() {
@@ -129,15 +153,15 @@ public class Ball extends DrawableObject {
     @Override
     public void draw(Graphics g, VirtualCamera camera) {
         double screenOffsetX = camera.getScreenOffsetX(this.x);
-        double screenOffsetY = camera.getScreenOffsetY(this.y) - centerZ;
+        double screenOffsetY = camera.getScreenOffsetY(this.y);
 
         // Draw shadow if ball in the air
-        if (centerZ > 0) {
-            double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX) - shadowImage.getWidth() / 2;
-            double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY) - shadowImage.getHeight() / 2;
+        if (sphere.getZ() > 0) {
+            double screenOffsetShadowX = screenOffsetX + animationFrames[currentFrameNumber].getFrameImage().getWidth() / 2 - shadowImage.getWidth() / 2;
+            double screenOffsetShadowY = screenOffsetY + animationFrames[currentFrameNumber].getFrameImage().getHeight() - shadowImage.getHeight() / 2 + sphere.getZ() - sphere.getRadius();
             g.drawImage(
                     shadowImage,
-                    (int) screenOffsetCenterX, (int) screenOffsetCenterY,
+                    (int) screenOffsetShadowX, (int) screenOffsetShadowY,
                     null
             );
         }
@@ -154,13 +178,13 @@ public class Ball extends DrawableObject {
             g.setColor(Color.MAGENTA);
             g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
 
-            double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX);
-            double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY);
+            double screenOffsetCenterX = screenOffsetX + animationFrames[currentFrameNumber].getFrameImage().getWidth() / 2 - sphere.getRadius();
+            double screenOffsetCenterY = screenOffsetY + animationFrames[currentFrameNumber].getFrameImage().getHeight() + sphere.getZ() - sphere.getRadius() * 2;
 
             g.setColor(Color.RED);
             g.drawOval(
-                    (int) (screenOffsetCenterX - sphere.getRadius()),
-                    (int) (screenOffsetCenterY - sphere.getRadius()),
+                    (int) (screenOffsetCenterX),
+                    (int) (screenOffsetCenterY),
                     (int) (sphere.getRadius() * 2),
                     (int) (sphere.getRadius() * 2)
             );

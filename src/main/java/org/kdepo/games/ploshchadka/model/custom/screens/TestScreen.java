@@ -90,7 +90,7 @@ public class TestScreen extends AbstractScreen {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        Ball ball = new Ball();
+        Ball ball = new Ball(0, 0, 14, 14);
 
         int radius = random.nextInt(20);
 
