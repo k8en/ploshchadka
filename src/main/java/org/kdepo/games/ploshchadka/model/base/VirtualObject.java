@@ -1,4 +1,4 @@
-package org.kdepo.games.ploshchadka.model.custom;
+package org.kdepo.games.ploshchadka.model.base;
 
 import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 

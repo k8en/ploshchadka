@@ -7,7 +7,7 @@ import java.awt.event.KeyListener;
 
 public class KeyboardInputs implements KeyListener {
 
-    private Ploshchadka ploshchadka;
+    private final Ploshchadka ploshchadka;
 
     public KeyboardInputs() {
         ploshchadka = Ploshchadka.getInstance();

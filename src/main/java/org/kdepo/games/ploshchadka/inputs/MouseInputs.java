@@ -8,7 +8,7 @@ import java.awt.event.MouseMotionListener;
 
 public class MouseInputs implements MouseListener, MouseMotionListener {
 
-    private Ploshchadka ploshchadka;
+    private final Ploshchadka ploshchadka;
 
     public MouseInputs() {
         ploshchadka = Ploshchadka.getInstance();
