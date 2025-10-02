@@ -9,6 +9,11 @@ public class Ground {
 
     private TileMap tileMap;
 
+    private int maxHeight;
+
+    private double friction;
+    private double gravity;
+
     public Ground() {
         tileMap = new TileMap();
         tileMap.load("training_ground.map");
@@ -20,6 +25,9 @@ public class Ground {
 
         tileMap.setX(-tileMap.getMapWidth() / 2);
         tileMap.setY(-tileMap.getMapHeight() / 2 - 32);
+
+        friction = 0.02d;
+        gravity = 0.0024d;
 
         System.out.println("Ground top left at " + tileMap.getX() + " " + tileMap.getY() + " width = " + tileMap.getMapWidth() + " height = " + tileMap.getMapHeight());
     }
@@ -38,6 +46,18 @@ public class Ground {
 
     public double getHeight() {
         return tileMap.getMapHeight();
+    }
+
+    public int getMaxHeight() {
+        return maxHeight;
+    }
+
+    public double getFriction() {
+        return friction;
+    }
+
+    public double getGravity() {
+        return gravity;
     }
 
     public void draw(Graphics g, VirtualCamera camera) {

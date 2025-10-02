@@ -5,10 +5,21 @@ import org.kdepo.games.ploshchadka.Ploshchadka;
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationPlayMode;
-import org.kdepo.games.ploshchadka.model.base.geometry.*;
+import org.kdepo.games.ploshchadka.model.base.geometry.OrthogonalPolygon;
+import org.kdepo.games.ploshchadka.model.base.geometry.Point3D;
+import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
+import org.kdepo.games.ploshchadka.model.base.geometry.Vector3D;
+import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
-import org.kdepo.games.ploshchadka.model.custom.*;
+import org.kdepo.games.ploshchadka.model.custom.Ball;
+import org.kdepo.games.ploshchadka.model.custom.CrossbarSegment;
+import org.kdepo.games.ploshchadka.model.custom.FaceDirection;
+import org.kdepo.games.ploshchadka.model.custom.Goalpost;
+import org.kdepo.games.ploshchadka.model.custom.Ground;
+import org.kdepo.games.ploshchadka.model.custom.Player;
+import org.kdepo.games.ploshchadka.model.custom.PlayerState;
+import org.kdepo.games.ploshchadka.model.custom.VirtualObject;
 import org.kdepo.games.ploshchadka.utils.CollisionUtils;
 import org.kdepo.games.ploshchadka.utils.MathUtils;
 import org.kdepo.games.ploshchadka.utils.ReflectionUtils;
@@ -17,33 +28,35 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.*;
 
 public class TrainingScreen extends AbstractScreen {
 
     private final Ploshchadka ploshchadka;
-    private final Random random;
 
     private final VirtualCamera camera;
     private final VirtualRectangle screenMovementBounds;
 
     private final Ball ball;
-    private double ballDistance;
-    private double ballDistanceForSpin;
 
-    private Ground ground;
+    private final Ground ground;
 
-    private Goalpost goalpost1;
-    private CrossbarSegment crossbarSegment1;
-    private CrossbarSegment crossbarSegment2a;
-    private CrossbarSegment crossbarSegment2b;
-    private CrossbarSegment crossbarSegment2c;
-    private CrossbarSegment crossbarSegment3;
-    private Goalpost goalpost2;
+    // Goalpost (right) rendering
+    private final Goalpost goalpostRight1;
+    private final CrossbarSegment crossbarSegmentRight1;
+    private final CrossbarSegment crossbarSegmentRight2a;
+    private final CrossbarSegment crossbarSegmentRight2b;
+    private final CrossbarSegment crossbarSegmentRight2c;
+    private final CrossbarSegment crossbarSegmentRight3;
+    private final Goalpost goalpostRight2;
 
-    private OrthogonalPolygon goalpost1Plane;
-    private OrthogonalPolygon goalpost2Plane;
+    // Goalpost (right) geometry
+    private final OrthogonalPolygon goalpostRight1Plane;
+    private final OrthogonalPolygon goalpostRight2Plane;
+    private final OrthogonalPolygon goalpostRightTopPlane;
+    private final OrthogonalPolygon goalpostRightBackPlane;
 
     private Player player;
 
@@ -54,44 +67,49 @@ public class TrainingScreen extends AbstractScreen {
     private boolean isButtonKick;
     private boolean isButtonPowerKick;
 
-    private double friction;
-
+    // List of objects to sort and render
     private final List<DrawableObject> renderList;
+
+    // List of objects to check for collision with ball
+    private final List<OrthogonalPolygon> geometryList;
 
     public TrainingScreen(Ploshchadka ploshchadka) {
         this.ploshchadka = ploshchadka;
-        random = new Random(new Date().getTime());
 
         ball = new Ball(0, 0, 14, 14);
-        ballDistance = 0;
-        ballDistanceForSpin = 0;
-
-        friction = 0.02d;
 
         ground = new Ground();
 
-        goalpost1 = new Goalpost(965, -69);
-        crossbarSegment1 = new CrossbarSegment(974, -48, CrossbarSegment.SEGMENT_TOP);
-        crossbarSegment2a = new CrossbarSegment(974, -24, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegment2b = new CrossbarSegment(974, 0, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegment2c = new CrossbarSegment(974, 24, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegment3 = new CrossbarSegment(974, 48, CrossbarSegment.SEGMENT_BOTTOM);
-        goalpost2 = new Goalpost(965, 49);
+        // Prepare goalpost (right) rendering parameters
+        goalpostRight1 = new Goalpost(965, -69);
+        crossbarSegmentRight1 = new CrossbarSegment(974, -48, CrossbarSegment.SEGMENT_TOP);
+        crossbarSegmentRight2a = new CrossbarSegment(974, -24, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegmentRight2b = new CrossbarSegment(974, 0, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegmentRight2c = new CrossbarSegment(974, 24, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegmentRight3 = new CrossbarSegment(974, 48, CrossbarSegment.SEGMENT_BOTTOM);
+        goalpostRight2 = new Goalpost(965, 49);
 
-        goalpost1Plane = new OrthogonalPolygon(
-                new Point3D(goalpost1.getX(), -60, goalpost1.getHeight()),
-                new Point3D(goalpost1.getX() + goalpost1.getWidth(), -60, goalpost1.getHeight()),
-                new Point3D(goalpost1.getX() + goalpost1.getWidth(), -60, 0),
-                new Point3D(goalpost1.getX(), -60, 0)
-        );
-        System.out.println("Goalpost1 plane: " + goalpost1Plane);
-        goalpost2Plane = new OrthogonalPolygon(
-                new Point3D(goalpost1.getX(), 60, goalpost1.getHeight()),
-                new Point3D(goalpost1.getX() + goalpost1.getWidth(), 60, goalpost1.getHeight()),
-                new Point3D(goalpost1.getX() + goalpost1.getWidth(), 60, 0),
-                new Point3D(goalpost1.getX(), 60, 0)
-        );
-        System.out.println("Goalpost2 plane: " + goalpost2Plane);
+        // Prepare goalpost (right) geometry parameters
+        Point3D a1 = new Point3D(goalpostRight1.getX(), -60, goalpostRight1.getHeight());
+        Point3D b1 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), -60, goalpostRight1.getHeight());
+        Point3D c1 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), -60, 0);
+        Point3D d1 = new Point3D(goalpostRight1.getX(), -60, 0);
+        Point3D a2 = new Point3D(goalpostRight1.getX(), 60, goalpostRight1.getHeight());
+        Point3D b2 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), 60, goalpostRight1.getHeight());
+        Point3D c2 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), 60, 0);
+        Point3D d2 = new Point3D(goalpostRight1.getX(), 60, 0);
+
+        goalpostRight1Plane = new OrthogonalPolygon(a1, b1, c1, d1);
+        goalpostRight2Plane = new OrthogonalPolygon(a2, b2, c2, d2);
+        goalpostRightTopPlane = new OrthogonalPolygon(a1, b1, b2, a2);
+        goalpostRightBackPlane = new OrthogonalPolygon(b2, b1, c1, c2);
+
+        // Collect geometry into single list
+        geometryList = new ArrayList<>();
+        geometryList.add(goalpostRight1Plane);
+        geometryList.add(goalpostRight2Plane);
+        geometryList.add(goalpostRightTopPlane);
+        geometryList.add(goalpostRightBackPlane);
 
         player = new Player();
 
@@ -126,7 +144,7 @@ public class TrainingScreen extends AbstractScreen {
         // Clear all previous messages
         Console.clear();
 
-        updateBall(ball);
+        updateBall(ball, ground, geometryList);
 
         updatePlayer(player, ball);
 
@@ -136,13 +154,13 @@ public class TrainingScreen extends AbstractScreen {
         renderList.clear();
         renderList.add(player);
         renderList.add(ball);
-        renderList.add(goalpost1);
-        renderList.add(crossbarSegment1);
-        renderList.add(crossbarSegment2a);
-        renderList.add(crossbarSegment2b);
-        renderList.add(crossbarSegment2c);
-        renderList.add(crossbarSegment3);
-        renderList.add(goalpost2);
+        renderList.add(goalpostRight1);
+        renderList.add(crossbarSegmentRight1);
+        renderList.add(crossbarSegmentRight2a);
+        renderList.add(crossbarSegmentRight2b);
+        renderList.add(crossbarSegmentRight2c);
+        renderList.add(crossbarSegmentRight3);
+        renderList.add(goalpostRight2);
         renderList.sort(Comparator.comparing(VirtualObject::getCenterY));
 
         // Output debug information
@@ -260,16 +278,16 @@ public class TrainingScreen extends AbstractScreen {
 
     }
 
-    public void updateBall(Ball ball) {
+    public void updateBall(Ball ball, Ground ground, List<OrthogonalPolygon> geometryList) {
         // Update ball state
         if (ball.getMovementSpeed() > 0) {
             double nextCenterX;
             double nextCenterY;
             double nextCenterZ;
 
-            nextCenterX = ball.getCenterX() + ball.getMovementVector().getX() * ball.getMovementSpeed();
-            nextCenterY = ball.getCenterY() + ball.getMovementVector().getY() * ball.getMovementSpeed();
-            nextCenterZ = ball.getCenterZ() + ball.getMovementVector().getZ() * ball.getMovementSpeed();
+            nextCenterX = ball.getSphere().getX() + ball.getMovementVector().getX() * ball.getMovementSpeed();
+            nextCenterY = ball.getSphere().getY() + ball.getMovementVector().getY() * ball.getMovementSpeed();
+            nextCenterZ = ball.getSphere().getZ() + ball.getMovementVector().getZ() * ball.getMovementSpeed();
 
             // Check for the left side
             if (nextCenterX < ground.getX()) {
@@ -298,27 +316,29 @@ public class TrainingScreen extends AbstractScreen {
             }
 
             // Check for the ceiling side
-            if (nextCenterZ > 10000) {
-                nextCenterZ = 10000;
+            if (nextCenterZ > ground.getMaxHeight()) {
+                nextCenterZ = ground.getMaxHeight();
                 double nextVectorZ = -ball.getMovementVector().getZ();
                 ball.getMovementVector().setZ(nextVectorZ);
             }
             // Check for the floor side
             if (nextCenterZ - ball.getSphere().getRadius() < 0) {
                 nextCenterZ = ball.getSphere().getRadius();
-                double nextSpeed = ball.getMovementSpeed() - ball.getMovementSpeed() / 1.85;
-                if (nextSpeed < 0.8) {
-                    nextSpeed = 0;
-                }
-                ball.setMovementSpeed(nextSpeed);
+//                double nextSpeed = ball.getMovementSpeed() - ball.getMovementSpeed() / 1.85;
+//                if (nextSpeed < 0.8) {
+//                    nextSpeed = 0;
+//                }
+//                System.out.println("Speed (next) " + nextSpeed);
+//                ball.setMovementSpeed(nextSpeed);
 
                 double nextVectorZ = -ball.getMovementVector().getZ();
                 ball.getMovementVector().setZ(nextVectorZ);
             }
 
-            ballDistance = ballDistance + MathUtils.getDistance2D(ball.getCenterX(), ball.getCenterY(), nextCenterX, nextCenterY);
-            if (ballDistance >= ballDistanceForSpin) {
-                ballDistance = ballDistance - ballDistanceForSpin;
+            double ballDistance = ball.getBallDistance() + MathUtils.getDistance2D(ball.getSphere().getX(), ball.getSphere().getY(), nextCenterX, nextCenterY);
+            if (ballDistance >= ball.getBallDistanceForSpin()) {
+                ballDistance = ballDistance - ball.getBallDistanceForSpin();
+                ball.setBallDistance(ballDistance);
                 if (ball.getMovementVector().getX() >= 0) {
                     ball.setNextFrame();
                 } else {
@@ -331,12 +351,14 @@ public class TrainingScreen extends AbstractScreen {
             ball.setCenterZ(nextCenterZ);
 
             // Apply gravity
-            if (ball.getCenterZ() - ball.getSphere().getRadius() > 0) {
-                double vectorZ = ball.getMovementVector().getZ() - 0.024;
+            if (ball.getSphere().getZ() - ball.getSphere().getRadius() > 0) {
+                double vectorZ = ball.getMovementVector().getZ() - ground.getGravity();
                 ball.getMovementVector().setZ(vectorZ);
-            } else if (ball.getCenterZ() - ball.getSphere().getRadius() == 0) {
+                System.out.println("Apply grav");
+            } else if (ball.getSphere().getZ() - ball.getSphere().getRadius() == 0) {
                 // Apply friction
-                double speed = ball.getMovementSpeed() - friction;
+                double speed = ball.getMovementSpeed() - ground.getFriction();
+                //System.out.println("Speed " + speed);
                 if (speed < 0) {
                     speed = 0;
                     ball.getMovementVector().setX(0);
@@ -346,19 +368,17 @@ public class TrainingScreen extends AbstractScreen {
                 ball.setMovementSpeed(speed);
             }
 
-            if (ball.getControlledBy() != null && ball.getCenterZ() > ball.getSphere().getRadius()) {
+            if (ball.getControlledBy() != null && ball.getSphere().getZ() > ball.getSphere().getRadius()) {
                 ball.setControlledBy(null);
             }
 
-            if (CollisionUtils.intersects(ball.getSphere(), goalpost1Plane)) {
-                Console.addMessage("Plane 1 intersection");
-                Vector3D reflectedVector = ReflectionUtils.reflectVector(ball.getMovementVector(), ball.getSphere(), goalpost1Plane);
-                ball.setMovementVector(reflectedVector);
-
-            } else if (CollisionUtils.intersects(ball.getSphere(), goalpost2Plane)) {
-                Console.addMessage("Plane 2 intersection");
-                Vector3D reflectedVector = ReflectionUtils.reflectVector(ball.getMovementVector(), ball.getSphere(), goalpost2Plane);
-                ball.setMovementVector(reflectedVector);
+            // Check collisions
+            for (OrthogonalPolygon polygon : geometryList) {
+                if (CollisionUtils.intersects(ball.getSphere(), polygon)) {
+                    Vector3D reflectedVector = ReflectionUtils.reflectVector(ball.getMovementVector(), ball.getSphere(), polygon);
+                    ball.setMovementVector(reflectedVector);
+                    break; // ?
+                }
             }
         }
 
@@ -825,6 +845,7 @@ public class TrainingScreen extends AbstractScreen {
                     ball.getMovementVector().setY(0);
                     ball.getMovementVector().setZ(0.7);
                     ball.setMovementSpeed(8);
+                    ball.setControlledBy(null);
 
                     player.startKick();
                 }
@@ -894,7 +915,7 @@ public class TrainingScreen extends AbstractScreen {
                 ball.getMovementVector().setX(vector2DNormalized.getX());
                 ball.getMovementVector().setY(vector2DNormalized.getY());
                 ball.getMovementVector().setZ(0);
-                ball.setMovementSpeed(3D);
+                ball.setMovementSpeed(3d);
             }
         }
     }

@@ -20,6 +20,10 @@ public class Ball extends DrawableObject {
     private Vector3D movementVector;
     private double movementSpeed;
 
+    // Ball spin
+    private double ballDistance;
+    private double ballDistanceForSpin;
+
     // Ball rendering
     private final AnimationFrame[] animationFrames;
     private int currentFrameNumber;
@@ -67,6 +71,10 @@ public class Ball extends DrawableObject {
         // Movement parameters
         movementVector = new Vector3D(0.0d, 0.0d, 0.0d);
         movementSpeed = 0.0d;
+
+        // Ball spin parameters
+        ballDistance = 0;
+        ballDistanceForSpin = 0;
 
         // For debug purposes
         debugInfoBuilder = new StringBuilder();
@@ -126,6 +134,22 @@ public class Ball extends DrawableObject {
 
     public void setMovementSpeed(double movementSpeed) {
         this.movementSpeed = movementSpeed;
+    }
+
+    public double getBallDistance() {
+        return ballDistance;
+    }
+
+    public void setBallDistance(double ballDistance) {
+        this.ballDistance = ballDistance;
+    }
+
+    public double getBallDistanceForSpin() {
+        return ballDistanceForSpin;
+    }
+
+    public void setBallDistanceForSpin(double ballDistanceForSpin) {
+        this.ballDistanceForSpin = ballDistanceForSpin;
     }
 
     public void setNextFrame() {
