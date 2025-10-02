@@ -218,15 +218,22 @@ public class Ball extends DrawableObject {
     public String getDebugInfo() {
         debugInfoBuilder.setLength(0);
 
-        debugInfoBuilder.append("Ball ");
+        debugInfoBuilder.append("Ball (");
         debugInfoBuilder.append(decimalFormat.format(centerX));
-        debugInfoBuilder.append(", ").append(decimalFormat.format(centerY));
-        debugInfoBuilder.append(", ").append(decimalFormat.format(centerZ));
+        debugInfoBuilder.append(" ").append(decimalFormat.format(centerY));
+        debugInfoBuilder.append(" ").append(decimalFormat.format(centerZ));
 
-        debugInfoBuilder.append(" sphere ");
+        debugInfoBuilder.append(") vector (");
+        debugInfoBuilder.append(decimalFormat.format(movementVector.getX()));
+        debugInfoBuilder.append(" ").append(decimalFormat.format(movementVector.getY()));
+        debugInfoBuilder.append(" ").append(decimalFormat.format(movementVector.getZ()));
+
+        debugInfoBuilder.append(") sphere (");
         debugInfoBuilder.append(decimalFormat.format(sphere.getX()));
-        debugInfoBuilder.append(", ").append(decimalFormat.format(sphere.getY()));
-        debugInfoBuilder.append(", ").append(decimalFormat.format(sphere.getX()));
+        debugInfoBuilder.append(" ").append(decimalFormat.format(sphere.getY()));
+        debugInfoBuilder.append(" ").append(decimalFormat.format(sphere.getZ()));
+
+        debugInfoBuilder.append(")");
 
         return debugInfoBuilder.toString();
     }

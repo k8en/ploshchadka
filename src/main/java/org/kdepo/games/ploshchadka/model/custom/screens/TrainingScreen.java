@@ -5,21 +5,10 @@ import org.kdepo.games.ploshchadka.Ploshchadka;
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationPlayMode;
-import org.kdepo.games.ploshchadka.model.base.geometry.OrthogonalPolygon;
-import org.kdepo.games.ploshchadka.model.base.geometry.Point3D;
-import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
-import org.kdepo.games.ploshchadka.model.base.geometry.Vector3D;
-import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
+import org.kdepo.games.ploshchadka.model.base.geometry.*;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
-import org.kdepo.games.ploshchadka.model.custom.Ball;
-import org.kdepo.games.ploshchadka.model.custom.CrossbarSegment;
-import org.kdepo.games.ploshchadka.model.custom.FaceDirection;
-import org.kdepo.games.ploshchadka.model.custom.Goalpost;
-import org.kdepo.games.ploshchadka.model.custom.Ground;
-import org.kdepo.games.ploshchadka.model.custom.Player;
-import org.kdepo.games.ploshchadka.model.custom.PlayerState;
-import org.kdepo.games.ploshchadka.model.custom.VirtualObject;
+import org.kdepo.games.ploshchadka.model.custom.*;
 import org.kdepo.games.ploshchadka.utils.CollisionUtils;
 import org.kdepo.games.ploshchadka.utils.MathUtils;
 import org.kdepo.games.ploshchadka.utils.ReflectionUtils;
@@ -324,12 +313,11 @@ public class TrainingScreen extends AbstractScreen {
             // Check for the floor side
             if (nextCenterZ - ball.getSphere().getRadius() < 0) {
                 nextCenterZ = ball.getSphere().getRadius();
-//                double nextSpeed = ball.getMovementSpeed() - ball.getMovementSpeed() / 1.85;
-//                if (nextSpeed < 0.8) {
-//                    nextSpeed = 0;
-//                }
-//                System.out.println("Speed (next) " + nextSpeed);
-//                ball.setMovementSpeed(nextSpeed);
+                double nextSpeed = ball.getMovementSpeed() - ball.getMovementSpeed() / 1.85;
+                if (nextSpeed < 0.8) {
+                    nextSpeed = 0;
+                }
+                ball.setMovementSpeed(nextSpeed);
 
                 double nextVectorZ = -ball.getMovementVector().getZ();
                 ball.getMovementVector().setZ(nextVectorZ);
@@ -354,11 +342,9 @@ public class TrainingScreen extends AbstractScreen {
             if (ball.getSphere().getZ() - ball.getSphere().getRadius() > 0) {
                 double vectorZ = ball.getMovementVector().getZ() - ground.getGravity();
                 ball.getMovementVector().setZ(vectorZ);
-                System.out.println("Apply grav");
             } else if (ball.getSphere().getZ() - ball.getSphere().getRadius() == 0) {
                 // Apply friction
                 double speed = ball.getMovementSpeed() - ground.getFriction();
-                //System.out.println("Speed " + speed);
                 if (speed < 0) {
                     speed = 0;
                     ball.getMovementVector().setX(0);
