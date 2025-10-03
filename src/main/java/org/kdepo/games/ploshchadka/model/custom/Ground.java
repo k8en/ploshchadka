@@ -28,7 +28,7 @@ public class Ground {
 
         maxHeight = 10000;
 
-        friction = 0.02d;
+        friction = 0.04d;
         gravity = 0.024d;
 
         System.out.println("Ground top left at " + tileMap.getX() + " " + tileMap.getY() + " width = " + tileMap.getMapWidth() + " height = " + tileMap.getMapHeight());

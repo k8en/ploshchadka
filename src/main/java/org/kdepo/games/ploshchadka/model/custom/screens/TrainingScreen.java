@@ -10,6 +10,7 @@ import org.kdepo.games.ploshchadka.model.base.geometry.*;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
 import org.kdepo.games.ploshchadka.model.custom.*;
+import org.kdepo.games.ploshchadka.utils.BallisticsUtils;
 import org.kdepo.games.ploshchadka.utils.CollisionUtils;
 import org.kdepo.games.ploshchadka.utils.MathUtils;
 import org.kdepo.games.ploshchadka.utils.ReflectionUtils;
@@ -598,10 +599,6 @@ public class TrainingScreen extends AbstractScreen {
                         } else {
                             throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
                         }
-
-                        ball.getMovementVector().setY(0);
-                        ball.getMovementVector().setZ(0.7);
-                        ball.setMovementSpeed(6);
                     }
                 }
 
@@ -810,23 +807,36 @@ public class TrainingScreen extends AbstractScreen {
                 if (frameNumber == 2) {
                     // Hit the ball with the last frame
                     System.out.println("Power kick on ball");
-                    if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
-                        ball.getMovementVector().setX(0.7);
-                    } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
-                        ball.getMovementVector().setX(-0.7);
-                    } else {
-                        throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+//                    if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+//                        ball.getMovementVector().setX(0.7);
+//                    } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+//                        ball.getMovementVector().setX(-0.7);
+//                    } else {
+//                        throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+//                    }
+
+                    Point3D startPoint = new Point3D(ball.getSphere().getX(), ball.getSphere().getY(), ball.getSphere().getZ());
+                    Point3D targetPoint = new Point3D(965, 0, 90);
+                    Impulse impulse = BallisticsUtils.calculateImpulse(startPoint, targetPoint, 0.024d);
+
+                    ball.getMovementVector().setX(impulse.getDirection().getX());
+                    ball.getMovementVector().setY(impulse.getDirection().getY());
+                    ball.getMovementVector().setZ(impulse.getDirection().getZ());
+
+                    double ballSpeed = impulse.getSpeed() * 2;
+                    if (ballSpeed < 8) {
+                        ballSpeed = 8;
                     }
-                    ball.getMovementVector().setY(0);
-                    ball.getMovementVector().setZ(0.7);
-                    ball.setMovementSpeed(8);
+                    ball.setMovementSpeed(ballSpeed);
+
+                    // Ball is not controlled anymore
                     ball.setControlledBy(null);
+                    player.setControllingTheBall(false);
 
                     player.startKick();
                 }
 
                 System.out.println("Not completed");
-
             }
         }
 
