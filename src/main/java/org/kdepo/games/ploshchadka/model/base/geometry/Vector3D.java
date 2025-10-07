@@ -48,7 +48,9 @@ public class Vector3D {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Vector3D vector3D = (Vector3D) o;
-        return Double.compare(x, vector3D.x) == 0 && Double.compare(y, vector3D.y) == 0 && Double.compare(z, vector3D.z) == 0;
+        return Double.compare(x, vector3D.x) == 0
+                && Double.compare(y, vector3D.y) == 0
+                && Double.compare(z, vector3D.z) == 0;
     }
 
     @Override
