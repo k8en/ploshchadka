@@ -2,14 +2,25 @@ package org.kdepo.games.ploshchadka.model.custom.screens;
 
 import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.Ploshchadka;
+import org.kdepo.games.ploshchadka.ai.CharactersController;
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.VirtualObject;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationPlayMode;
-import org.kdepo.games.ploshchadka.model.base.geometry.*;
+import org.kdepo.games.ploshchadka.model.base.geometry.OrthogonalPolygon;
+import org.kdepo.games.ploshchadka.model.base.geometry.Point3D;
+import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
+import org.kdepo.games.ploshchadka.model.base.geometry.Vector3D;
+import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
-import org.kdepo.games.ploshchadka.model.custom.*;
+import org.kdepo.games.ploshchadka.model.custom.Ball;
+import org.kdepo.games.ploshchadka.model.custom.Controls;
+import org.kdepo.games.ploshchadka.model.custom.CrossbarSegment;
+import org.kdepo.games.ploshchadka.model.custom.FaceDirection;
+import org.kdepo.games.ploshchadka.model.custom.Goalpost;
+import org.kdepo.games.ploshchadka.model.custom.Ground;
+import org.kdepo.games.ploshchadka.model.custom.Impulse;
 import org.kdepo.games.ploshchadka.model.custom.characters.CharacterState;
 import org.kdepo.games.ploshchadka.model.custom.characters.GoalKeeper;
 import org.kdepo.games.ploshchadka.model.custom.characters.Player;
@@ -52,14 +63,17 @@ public class TrainingScreen extends AbstractScreen {
     private final OrthogonalPolygon goalpostRightTopPlane;
     private final OrthogonalPolygon goalpostRightBackPlane;
 
+    // Game participants control
+    CharactersController charactersController;
+
     private Controls humanControls;
     private Controls aiControls;
 
-    private Player player;
-    private List<Player> playersList;
+    //    private Player player;
+    private List<Player> players;
 
-    private GoalKeeper goalKeeper;
-    private List<GoalKeeper> goalKeepersList;
+    //    private GoalKeeper goalKeeper;
+    private List<GoalKeeper> goalKeepers;
 
     // List of objects to sort and render
     private final List<DrawableObject> renderList;
@@ -75,23 +89,23 @@ public class TrainingScreen extends AbstractScreen {
         ground = new Ground();
 
         // Prepare goalpost (right) rendering parameters
-        goalpostRight1 = new Goalpost(965, -69);
-        crossbarSegmentRight1 = new CrossbarSegment(974, -48, CrossbarSegment.SEGMENT_TOP);
-        crossbarSegmentRight2a = new CrossbarSegment(974, -24, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegmentRight2b = new CrossbarSegment(974, 0, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegmentRight2c = new CrossbarSegment(974, 24, CrossbarSegment.SEGMENT_MIDDLE);
-        crossbarSegmentRight3 = new CrossbarSegment(974, 48, CrossbarSegment.SEGMENT_BOTTOM);
-        goalpostRight2 = new Goalpost(965, 49);
+        goalpostRight1 = new Goalpost(965, -69+16);
+        crossbarSegmentRight1 = new CrossbarSegment(974, -48+16, CrossbarSegment.SEGMENT_TOP);
+        crossbarSegmentRight2a = new CrossbarSegment(974, -24+16, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegmentRight2b = new CrossbarSegment(974, 0+16, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegmentRight2c = new CrossbarSegment(974, 24+16, CrossbarSegment.SEGMENT_MIDDLE);
+        crossbarSegmentRight3 = new CrossbarSegment(974, 48+16, CrossbarSegment.SEGMENT_BOTTOM);
+        goalpostRight2 = new Goalpost(965, 49+16);
 
         // Prepare goalpost (right) geometry parameters
-        Point3D a1 = new Point3D(goalpostRight1.getX(), -60, goalpostRight1.getHeight());
-        Point3D b1 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), -60, goalpostRight1.getHeight());
-        Point3D c1 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), -60, 0);
-        Point3D d1 = new Point3D(goalpostRight1.getX(), -60, 0);
-        Point3D a2 = new Point3D(goalpostRight1.getX(), 60, goalpostRight1.getHeight());
-        Point3D b2 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), 60, goalpostRight1.getHeight());
-        Point3D c2 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), 60, 0);
-        Point3D d2 = new Point3D(goalpostRight1.getX(), 60, 0);
+        Point3D a1 = new Point3D(goalpostRight1.getX(), -60+16, goalpostRight1.getHeight());
+        Point3D b1 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), -60+16, goalpostRight1.getHeight());
+        Point3D c1 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), -60+16, 0);
+        Point3D d1 = new Point3D(goalpostRight1.getX(), -60+16, 0);
+        Point3D a2 = new Point3D(goalpostRight1.getX(), 60+16, goalpostRight1.getHeight());
+        Point3D b2 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), 60+16, goalpostRight1.getHeight());
+        Point3D c2 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), 60+16, 0);
+        Point3D d2 = new Point3D(goalpostRight1.getX(), 60+16, 0);
 
         goalpostRight1Plane = new OrthogonalPolygon(a1, b1, c1, d1);
         goalpostRight2Plane = new OrthogonalPolygon(a2, b2, c2, d2);
@@ -105,24 +119,27 @@ public class TrainingScreen extends AbstractScreen {
         geometryList.add(goalpostRightTopPlane);
         geometryList.add(goalpostRightBackPlane);
 
+        // Initialize characters controller
+        charactersController = CharactersController.getInstance();
+
         humanControls = new Controls();
         aiControls = new Controls();
 
         // Prepare players
-        playersList = new ArrayList<>();
+        players = new ArrayList<>();
 
-        player = new Player(1, Constants.AnimationName.STAND_RIGHT, -50, 0, 0);
+        Player player = new Player(1, Constants.AnimationName.STAND_RIGHT, -50, 0, 0);
         player.setTeamId(Constants.Team.TEST_LEFT);
         player.setHumanControls(true);
-        playersList.add(player);
+        players.add(player);
 
         // Prepare goal keepers
-        goalKeepersList = new ArrayList<>();
+        goalKeepers = new ArrayList<>();
 
-        goalKeeper = new GoalKeeper(2, Constants.AnimationName.STAND_LEFT, 100, 0, 0);
+        GoalKeeper goalKeeper = new GoalKeeper(2, Constants.AnimationName.STAND_LEFT, 100, 0, 0);
         goalKeeper.setTeamId(Constants.Team.TEST_RIGHT);
 
-        goalKeepersList.add(goalKeeper);
+        goalKeepers.add(goalKeeper);
 
         // Prepare camera
         camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
@@ -152,28 +169,30 @@ public class TrainingScreen extends AbstractScreen {
         updateBall(ball, ground, geometryList);
 
         // Update players
-        for (Player p : playersList) {
-            if (p.isHumanControls()) {
+        for (Player player : players) {
+            if (player.isHumanControls()) {
                 updatePlayer(player, humanControls, ball);
             } else {
-                //aiControls = resolvePlayerControls..
-                //updatePlayer(player, aiControls, ball);
+                aiControls = charactersController.resolvePlayerControls(aiControls, ball, player, players, goalKeepers);
+                updatePlayer(player, aiControls, ball);
             }
         }
 
         // Update goal keepers
-        for (GoalKeeper gk : goalKeepersList) {
-            //aiControls = resolveGoalKeeperControls..
-            //updateGoalKeeper(player, aiControls, ball);
+        for (GoalKeeper goalKeeper : goalKeepers) {
+            aiControls = charactersController.resolveGoalKeeperControls(aiControls, ball, goalKeeper, players, goalKeepers);
+            updateGoalKeeper(goalKeeper, aiControls, ball);
         }
 
         // Update camera parameters
         updateCamera(camera, screenMovementBounds, ball);
 
         // Prepare render list ordered by Y coordinate
-        renderList.clear();
-        renderList.add(player);
-        renderList.add(goalKeeper);
+        renderList.clear(); // TODO should we clear this every time?
+
+        renderList.addAll(players);
+        renderList.addAll(goalKeepers);
+
         renderList.add(ball);
         renderList.add(goalpostRight1);
         renderList.add(crossbarSegmentRight1);
@@ -890,6 +909,9 @@ public class TrainingScreen extends AbstractScreen {
         player.update();
 
         Console.addMessage("Player center(" + player.getCenterX() + "," + player.getCenterY() + "," + player.getCenterZ() + ") state=" + player.getCharacterState());
+    }
+
+    private void updateGoalKeeper(GoalKeeper goalKeeper, Controls aiControls, Ball ball) {
     }
 
     public void updateCamera(VirtualCamera camera, VirtualRectangle cameraMovementBounds, VirtualObject target) {
