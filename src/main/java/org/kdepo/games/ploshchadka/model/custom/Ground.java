@@ -7,25 +7,30 @@ import java.awt.*;
 
 public class Ground {
 
-    private TileMap tileMap;
+    private final TileMap tileMap;
 
-    private int maxHeight;
+    private final int maxHeight;
 
-    private double friction;
-    private double gravity;
+    private final double friction;
+    private final double gravity;
 
     public Ground() {
         tileMap = new TileMap();
         tileMap.load("training_ground.map");
 
-        tileMap.setTileWidth(32);
-        tileMap.setTileHeight(32);
+        int tileWidth = 32;  // TODO make it configurable / readable
+        int tileHeight = 32;
+
+        tileMap.setTileWidth(tileWidth);
+        tileMap.setTileHeight(tileHeight);
         tileMap.setMapWidth(tileMap.getTileWidth() * tileMap.getTiles()[0].length);
         tileMap.setMapHeight(tileMap.getTileHeight() * tileMap.getTiles().length);
 
+        // Align center tile map to ball start position
         tileMap.setX(-tileMap.getMapWidth() / 2);
-        tileMap.setY(-tileMap.getMapHeight() / 2 - 32);
+        tileMap.setY(-tileMap.getMapHeight() / 2 - tileHeight / 2);
 
+        // Limitation for Z coordinate
         maxHeight = 10000;
 
         friction = 0.04d;

@@ -10,6 +10,9 @@ import org.kdepo.games.ploshchadka.model.base.geometry.*;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
 import org.kdepo.games.ploshchadka.model.custom.*;
+import org.kdepo.games.ploshchadka.model.custom.characters.CharacterState;
+import org.kdepo.games.ploshchadka.model.custom.characters.GoalKeeper;
+import org.kdepo.games.ploshchadka.model.custom.characters.Player;
 import org.kdepo.games.ploshchadka.utils.BallisticsUtils;
 import org.kdepo.games.ploshchadka.utils.CollisionUtils;
 import org.kdepo.games.ploshchadka.utils.MathUtils;
@@ -49,8 +52,14 @@ public class TrainingScreen extends AbstractScreen {
     private final OrthogonalPolygon goalpostRightTopPlane;
     private final OrthogonalPolygon goalpostRightBackPlane;
 
+    private Controls humanControls;
+    private Controls aiControls;
+
     private Player player;
-    private Controls playerControls;
+    private List<Player> playersList;
+
+    private GoalKeeper goalKeeper;
+    private List<GoalKeeper> goalKeepersList;
 
     // List of objects to sort and render
     private final List<DrawableObject> renderList;
@@ -96,9 +105,26 @@ public class TrainingScreen extends AbstractScreen {
         geometryList.add(goalpostRightTopPlane);
         geometryList.add(goalpostRightBackPlane);
 
-        player = new Player();
-        playerControls = new Controls();
+        humanControls = new Controls();
+        aiControls = new Controls();
 
+        // Prepare players
+        playersList = new ArrayList<>();
+
+        player = new Player(1, Constants.AnimationName.STAND_RIGHT, -50, 0, 0);
+        player.setTeamId(Constants.Team.TEST_LEFT);
+        player.setHumanControls(true);
+        playersList.add(player);
+
+        // Prepare goal keepers
+        goalKeepersList = new ArrayList<>();
+
+        goalKeeper = new GoalKeeper(2, Constants.AnimationName.STAND_LEFT, 100, 0, 0);
+        goalKeeper.setTeamId(Constants.Team.TEST_RIGHT);
+
+        goalKeepersList.add(goalKeeper);
+
+        // Prepare camera
         camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
         camera.setCameraCenter(0.0d, 0.0d);
 
@@ -125,13 +151,29 @@ public class TrainingScreen extends AbstractScreen {
 
         updateBall(ball, ground, geometryList);
 
-        updatePlayer(player, playerControls, ball);
+        // Update players
+        for (Player p : playersList) {
+            if (p.isHumanControls()) {
+                updatePlayer(player, humanControls, ball);
+            } else {
+                //aiControls = resolvePlayerControls..
+                //updatePlayer(player, aiControls, ball);
+            }
+        }
 
+        // Update goal keepers
+        for (GoalKeeper gk : goalKeepersList) {
+            //aiControls = resolveGoalKeeperControls..
+            //updateGoalKeeper(player, aiControls, ball);
+        }
+
+        // Update camera parameters
         updateCamera(camera, screenMovementBounds, ball);
 
         // Prepare render list ordered by Y coordinate
         renderList.clear();
         renderList.add(player);
+        renderList.add(goalKeeper);
         renderList.add(ball);
         renderList.add(goalpostRight1);
         renderList.add(crossbarSegmentRight1);
@@ -211,34 +253,34 @@ public class TrainingScreen extends AbstractScreen {
     @Override
     public void keyPressed(KeyEvent e) {
         if (KeyEvent.VK_RIGHT == e.getKeyCode()) {
-            playerControls.setButtonRight(true);
+            humanControls.setButtonRight(true);
         } else if (KeyEvent.VK_LEFT == e.getKeyCode()) {
-            playerControls.setButtonLeft(true);
+            humanControls.setButtonLeft(true);
         } else if (KeyEvent.VK_UP == e.getKeyCode()) {
-            playerControls.setButtonUp(true);
+            humanControls.setButtonUp(true);
         } else if (KeyEvent.VK_DOWN == e.getKeyCode()) {
-            playerControls.setButtonDown(true);
+            humanControls.setButtonDown(true);
         } else if (KeyEvent.VK_SPACE == e.getKeyCode()) {
-            playerControls.setButtonKick(true);
+            humanControls.setButtonKick(true);
         } else if (KeyEvent.VK_C == e.getKeyCode()) {
-            playerControls.setButtonPowerKick(true);
+            humanControls.setButtonPowerKick(true);
         }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         if (KeyEvent.VK_RIGHT == e.getKeyCode()) {
-            playerControls.setButtonRight(false);
+            humanControls.setButtonRight(false);
         } else if (KeyEvent.VK_LEFT == e.getKeyCode()) {
-            playerControls.setButtonLeft(false);
+            humanControls.setButtonLeft(false);
         } else if (KeyEvent.VK_UP == e.getKeyCode()) {
-            playerControls.setButtonUp(false);
+            humanControls.setButtonUp(false);
         } else if (KeyEvent.VK_DOWN == e.getKeyCode()) {
-            playerControls.setButtonDown(false);
+            humanControls.setButtonDown(false);
         } else if (KeyEvent.VK_SPACE == e.getKeyCode()) {
-            playerControls.setButtonKick(false);
+            humanControls.setButtonKick(false);
         } else if (KeyEvent.VK_C == e.getKeyCode()) {
-            playerControls.setButtonPowerKick(false);
+            humanControls.setButtonPowerKick(false);
         }
     }
 
@@ -359,10 +401,11 @@ public class TrainingScreen extends AbstractScreen {
         }
 
         //Console.addMessage(ball.getDebugInfo());
+        Console.addMessage("Ball center(" + ball.getCenterX() + "," + ball.getCenterY() + "," + ball.getCenterZ() + ")");
     }
 
     public void updatePlayer(Player player, Controls playerControls, Ball ball) {
-        if (PlayerState.STAND.equals(player.getPlayerState())) {
+        if (CharacterState.STAND.equals(player.getCharacterState())) {
             if (playerControls.isButtonKick()) {
                 // Ball KICK intent while STAND
                 if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
@@ -384,7 +427,7 @@ public class TrainingScreen extends AbstractScreen {
                         player.getAnimationsController().resetCurrentFrameNumber();
                         player.getAnimationsController().setTicksPassed(0);
 
-                        player.setPlayerState(PlayerState.KICK);
+                        player.setCharacterState(CharacterState.KICK);
                         player.startKick();
 
                         // Hit the ball
@@ -428,7 +471,7 @@ public class TrainingScreen extends AbstractScreen {
                         player.getAnimationsController().resetCurrentFrameNumber();
                         player.getAnimationsController().setTicksPassed(0);
 
-                        player.setPlayerState(PlayerState.POWER_KICK);
+                        player.setCharacterState(CharacterState.POWER_KICK);
                     }
 
                 } else {
@@ -453,7 +496,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
 
-                player.setPlayerState(PlayerState.RUN);
+                player.setCharacterState(CharacterState.RUN);
 
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
                 player.setCenterY(nextCenterY);
@@ -465,7 +508,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.RIGHT);
-                player.setPlayerState(PlayerState.RUN);
+                player.setCharacterState(CharacterState.RUN);
 
                 double nextCenterX = player.getCenterX() + player.getRunSpeed();
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
@@ -479,7 +522,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.RIGHT);
-                player.setPlayerState(PlayerState.RUN);
+                player.setCharacterState(CharacterState.RUN);
 
                 double nextCenterX = player.getCenterX() + player.getRunSpeed();
                 player.setCenterX(nextCenterX);
@@ -491,7 +534,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.RIGHT);
-                player.setPlayerState(PlayerState.RUN);
+                player.setCharacterState(CharacterState.RUN);
 
                 double nextCenterX = player.getCenterX() + player.getRunSpeed();
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
@@ -516,7 +559,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
 
-                player.setPlayerState(PlayerState.RUN);
+                player.setCharacterState(CharacterState.RUN);
 
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
                 player.setCenterY(nextCenterY);
@@ -528,7 +571,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.LEFT);
-                player.setPlayerState(PlayerState.RUN);
+                player.setCharacterState(CharacterState.RUN);
 
                 double nextCenterX = player.getCenterX() - player.getRunSpeed();
                 double nextCenterY = player.getCenterY() + player.getRunSpeed();
@@ -542,7 +585,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.LEFT);
-                player.setPlayerState(PlayerState.RUN);
+                player.setCharacterState(CharacterState.RUN);
 
                 double nextCenterX = player.getCenterX() - player.getRunSpeed();
                 player.setCenterX(nextCenterX);
@@ -554,7 +597,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
                 player.setFaceDirection(FaceDirection.LEFT);
-                player.setPlayerState(PlayerState.RUN);
+                player.setCharacterState(CharacterState.RUN);
 
                 double nextCenterX = player.getCenterX() - player.getRunSpeed();
                 double nextCenterY = player.getCenterY() - player.getRunSpeed();
@@ -566,7 +609,7 @@ public class TrainingScreen extends AbstractScreen {
                 checkBallControl(player, ball);
             }
 
-        } else if (PlayerState.RUN.equals(player.getPlayerState())) {
+        } else if (CharacterState.RUN.equals(player.getCharacterState())) {
             if (playerControls.isButtonKick()) {
                 // Ball KICK intent while RUN
                 if (player.isReadyToKick()) {
@@ -585,7 +628,7 @@ public class TrainingScreen extends AbstractScreen {
                     player.getAnimationsController().resetCurrentFrameNumber();
                     player.getAnimationsController().setTicksPassed(0);
 
-                    player.setPlayerState(PlayerState.KICK);
+                    player.setCharacterState(CharacterState.KICK);
                     player.startKick();
 
                     // Hit the ball
@@ -622,7 +665,7 @@ public class TrainingScreen extends AbstractScreen {
                         player.getAnimationsController().resetCurrentFrameNumber();
                         player.getAnimationsController().setTicksPassed(0);
 
-                        player.setPlayerState(PlayerState.POWER_KICK);
+                        player.setCharacterState(CharacterState.POWER_KICK);
                     }
 
                 } else {
@@ -742,7 +785,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
 
-                player.setPlayerState(PlayerState.STAND);
+                player.setCharacterState(CharacterState.STAND);
                 checkBallControl(player, ball);
 
             }
@@ -760,7 +803,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.setCenterZ(0);
             }
 
-        } else if (PlayerState.KICK.equals(player.getPlayerState())) {
+        } else if (CharacterState.KICK.equals(player.getCharacterState())) {
             // Process KICK state
             // Check if animation is completed - switch to the next animation
             if (player.getAnimationsController().isPlayCompleted()) {
@@ -777,10 +820,10 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
 
-                player.setPlayerState(PlayerState.STAND);
+                player.setCharacterState(CharacterState.STAND);
             }
 
-        } else if (PlayerState.POWER_KICK.equals(player.getPlayerState())) {
+        } else if (CharacterState.POWER_KICK.equals(player.getCharacterState())) {
             // Process POWER_KICK state
             // Check if animation is completed - switch to the next animation
             if (player.getAnimationsController().isPlayCompleted()) {
@@ -797,7 +840,7 @@ public class TrainingScreen extends AbstractScreen {
                 player.getAnimationsController().resetCurrentFrameNumber();
                 player.getAnimationsController().setTicksPassed(0);
 
-                player.setPlayerState(PlayerState.STAND);
+                player.setCharacterState(CharacterState.STAND);
 
                 System.out.println("Completed");
 
@@ -846,7 +889,7 @@ public class TrainingScreen extends AbstractScreen {
         // Update internal parameters
         player.update();
 
-        Console.addMessage("Player center(" + player.getCenterX() + "," + player.getCenterY() + "," + player.getCenterZ() + ") state=" + player.getPlayerState());
+        Console.addMessage("Player center(" + player.getCenterX() + "," + player.getCenterY() + "," + player.getCenterZ() + ") state=" + player.getCharacterState());
     }
 
     public void updateCamera(VirtualCamera camera, VirtualRectangle cameraMovementBounds, VirtualObject target) {
@@ -887,13 +930,13 @@ public class TrainingScreen extends AbstractScreen {
 
         if (ball.getControlledBy() == null) {
             // If ball is not controlled by any player
-            if (distanceToBall <= player.getRadius() + ball.getSphere().getRadius()) {
+            if (distanceToBall <= player.getCharacterRadius() + ball.getSphere().getRadius()) {
                 // If distance between player and ball is enough to acquire control
                 ball.setControlledBy(player);
             }
         } else if (player.getId() == ball.getControlledBy().getId()) {
             // If ball is controlled by player
-            if (distanceToBall > player.getRadius() + ball.getSphere().getRadius()) {
+            if (distanceToBall > player.getCharacterRadius() + ball.getSphere().getRadius()) {
                 // If ball is too far from player - need to adjust distance
                 Vector2D vector2D = MathUtils.getVector2D(ball.getCenterX(), ball.getCenterY(), player.getCenterX(), player.getCenterY());
                 Vector2D vector2DNormalized = MathUtils.getVector2DNormalized(vector2D.getX(), vector2D.getY());

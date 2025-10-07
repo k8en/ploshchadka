@@ -1,10 +1,12 @@
-package org.kdepo.games.ploshchadka.model.custom;
+package org.kdepo.games.ploshchadka.model.custom.characters;
 
-public enum PlayerState {
+public enum CharacterState {
 
     LIE,
+    SIT,
     CRAWL,
     STAND,
+
     WALK,
     RUN,
     DASH,

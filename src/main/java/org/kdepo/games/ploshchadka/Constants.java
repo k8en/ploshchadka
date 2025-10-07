@@ -18,6 +18,12 @@ public class Constants {
         int HEIGHT = 600;
     }
 
+    public interface Team {
+        int REFEREE = 1;
+        int TEST_LEFT = 2;
+        int TEST_RIGHT = 3;
+    }
+
     private Constants() {
         throw new RuntimeException("Instantiation is not allowed");
     }
