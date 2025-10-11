@@ -106,7 +106,7 @@ public class Ball extends DrawableObject {
         sphere.setY(centerY);
 
         // Adjust picture position according to the object center
-        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
+        this.y = centerY - centerZ - animationFrames[currentFrameNumber].getFrameImage().getHeight() * 1.0 / 2;
     }
 
     @Override
@@ -118,7 +118,7 @@ public class Ball extends DrawableObject {
         sphere.setZ(centerZ);
 
         // Adjust sprite rendering position
-        this.y = centerY - animationFrames[currentFrameNumber].getFrameImage().getHeight() - centerZ;
+        this.y = centerY - centerZ - animationFrames[currentFrameNumber].getFrameImage().getHeight() * 1.0 / 2;
     }
 
     @Override
