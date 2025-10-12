@@ -24,7 +24,14 @@ public class MathUtils {
 
     public static Vector2D getVector2DNormalized(double x, double y) {
         double length = Math.sqrt(x * x + y * y);
+        if (length == 0) {
+            return new Vector2D(x, y);
+        }
         return new Vector2D(x / length, y / length);
+    }
+
+    public static Vector2D getVector2DNormalized(Vector2D v) {
+        return MathUtils.getVector2DNormalized(v.getX(), v.getY());
     }
 
     public static Vector3D getVector3DNormalized(Vector3D v) {

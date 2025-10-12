@@ -194,7 +194,6 @@ public class TileMap {
 
         int tileX2 = TileMapUtils.getTileColumnByX(camera.getX() + camera.getWidth(), this.x, (int) this.mapWidth, this.tileWidth);
         if (tileX2 == -1) {
-            System.out.println("RIGHT SIDE -1 for " + (camera.getX() + camera.getWidth()) + " " + this.x + " " + this.mapWidth + " " + this.tileWidth);
             return;
         }
 

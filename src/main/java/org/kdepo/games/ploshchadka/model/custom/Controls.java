@@ -10,6 +10,8 @@ public class Controls {
     private boolean isButtonLeft;
     private boolean isButtonKick;
     private boolean isButtonPowerKick;
+    private boolean isButtonPass;
+    private boolean isButtonJump;
 
     public Controls() {
         isButtonUp = false;
@@ -18,6 +20,8 @@ public class Controls {
         isButtonLeft = false;
         isButtonKick = false;
         isButtonPowerKick = false;
+        isButtonPass = false;
+        isButtonJump = false;
     }
 
     public boolean isButtonUp() {
@@ -68,9 +72,24 @@ public class Controls {
         isButtonPowerKick = buttonPowerKick;
     }
 
+    public boolean isButtonPass() {
+        return isButtonPass;
+    }
+
+    public void setButtonPass(boolean buttonPass) {
+        isButtonPass = buttonPass;
+    }
+
+    public boolean isButtonJump() {
+        return isButtonJump;
+    }
+
+    public void setButtonJump(boolean buttonJump) {
+        isButtonJump = buttonJump;
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Controls controls = (Controls) o;
         return isButtonUp == controls.isButtonUp
@@ -78,12 +97,14 @@ public class Controls {
                 && isButtonDown == controls.isButtonDown
                 && isButtonLeft == controls.isButtonLeft
                 && isButtonKick == controls.isButtonKick
-                && isButtonPowerKick == controls.isButtonPowerKick;
+                && isButtonPowerKick == controls.isButtonPowerKick
+                && isButtonPass == controls.isButtonPass
+                && isButtonJump == controls.isButtonJump;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(isButtonUp, isButtonRight, isButtonDown, isButtonLeft, isButtonKick, isButtonPowerKick);
+        return Objects.hash(isButtonUp, isButtonRight, isButtonDown, isButtonLeft, isButtonKick, isButtonPowerKick, isButtonPass, isButtonJump);
     }
 
     @Override
@@ -95,6 +116,8 @@ public class Controls {
                 ", isButtonLeft=" + isButtonLeft +
                 ", isButtonKick=" + isButtonKick +
                 ", isButtonPowerKick=" + isButtonPowerKick +
+                ", isButtonPass=" + isButtonPass +
+                ", isButtonJump=" + isButtonJump +
                 '}';
     }
 }

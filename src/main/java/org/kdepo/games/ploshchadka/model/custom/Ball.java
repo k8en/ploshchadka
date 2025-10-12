@@ -76,7 +76,7 @@ public class Ball extends DrawableObject {
 
         // Ball spin parameters
         ballDistance = 0;
-        ballDistanceForSpin = 0;
+        ballDistanceForSpin = 8;
 
         // For debug purposes
         debugInfoBuilder = new StringBuilder();
