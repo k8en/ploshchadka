@@ -3,7 +3,6 @@ package org.kdepo.games.ploshchadka.model.custom.characters;
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationsController;
-import org.kdepo.games.ploshchadka.model.custom.FaceDirection;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

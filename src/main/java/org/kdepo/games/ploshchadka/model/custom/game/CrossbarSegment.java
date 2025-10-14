@@ -1,4 +1,4 @@
-package org.kdepo.games.ploshchadka.model.custom;
+package org.kdepo.games.ploshchadka.model.custom.game;
 
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
@@ -7,25 +7,36 @@ import org.kdepo.games.ploshchadka.utils.FileUtils;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-public class Goalpost extends DrawableObject {
+public class CrossbarSegment extends DrawableObject {
+
+    public static final int SEGMENT_TOP = 1;
+    public static final int SEGMENT_MIDDLE = 2;
+    public static final int SEGMENT_BOTTOM = 3;
 
     private final BufferedImage image;
 
-    public Goalpost(double centerX, double centerY) {
+    public CrossbarSegment(double centerX, double centerY, int segmentNumber) {
         // Prepare image
-        image = FileUtils.loadImage("goalpost.png");
+        if (CrossbarSegment.SEGMENT_TOP == segmentNumber) {
+            image = FileUtils.loadImage("crossbar01.png");
+        } else if (CrossbarSegment.SEGMENT_MIDDLE == segmentNumber) {
+            image = FileUtils.loadImage("crossbar02.png");
+        } else if (CrossbarSegment.SEGMENT_BOTTOM == segmentNumber) {
+            image = FileUtils.loadImage("crossbar03.png");
+        } else {
+            throw new RuntimeException("Unknown crossbar segment number " + segmentNumber);
+        }
 
         // Virtual position parameters
         this.centerX = centerX;
         this.centerY = centerY;
-        this.centerZ = 0;
+        this.centerZ = 66;
 
         // Sprite position based on virtual position parameters
         this.x = centerX - image.getWidth() * 1.0 / 2;
         this.y = centerY - image.getHeight() - centerZ;
         this.width = image.getWidth();
         this.height = image.getHeight();
-        System.out.println("Top left " + x + " " + y + " bottom right " + (x + width) + " " + (y + height));
     }
 
     @Override
@@ -39,5 +50,4 @@ public class Goalpost extends DrawableObject {
                 null
         );
     }
-
 }

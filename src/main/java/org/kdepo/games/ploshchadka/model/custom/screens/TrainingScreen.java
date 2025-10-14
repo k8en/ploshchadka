@@ -13,15 +13,17 @@ import org.kdepo.games.ploshchadka.model.base.geometry.Vector3D;
 import org.kdepo.games.ploshchadka.model.base.geometry.VirtualRectangle;
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
-import org.kdepo.games.ploshchadka.model.custom.Ball;
 import org.kdepo.games.ploshchadka.model.custom.Controls;
-import org.kdepo.games.ploshchadka.model.custom.CrossbarSegment;
-import org.kdepo.games.ploshchadka.model.custom.FaceDirection;
-import org.kdepo.games.ploshchadka.model.custom.GameState;
-import org.kdepo.games.ploshchadka.model.custom.Goalpost;
 import org.kdepo.games.ploshchadka.model.custom.Ground;
-import org.kdepo.games.ploshchadka.model.custom.characters.GoalKeeper;
-import org.kdepo.games.ploshchadka.model.custom.characters.Player;
+import org.kdepo.games.ploshchadka.model.custom.characters.FaceDirection;
+import org.kdepo.games.ploshchadka.model.custom.game.Ball;
+import org.kdepo.games.ploshchadka.model.custom.game.CrossbarSegment;
+import org.kdepo.games.ploshchadka.model.custom.game.GameState;
+import org.kdepo.games.ploshchadka.model.custom.game.GoalKeeper;
+import org.kdepo.games.ploshchadka.model.custom.game.Goalpost;
+import org.kdepo.games.ploshchadka.model.custom.game.MatchInfo;
+import org.kdepo.games.ploshchadka.model.custom.game.Player;
+import org.kdepo.games.ploshchadka.model.custom.game.Team;
 import org.kdepo.games.ploshchadka.utils.CollisionUtils;
 import org.kdepo.games.ploshchadka.utils.MathUtils;
 import org.kdepo.games.ploshchadka.utils.ReflectionUtils;
@@ -40,6 +42,8 @@ public class TrainingScreen extends AbstractScreen {
 
     private final VirtualCamera camera;
     private final VirtualRectangle screenMovementBounds;
+
+    private GameState gameState;
 
     private final Ball ball;
 
@@ -69,6 +73,11 @@ public class TrainingScreen extends AbstractScreen {
     // To prepare controls based on algo calculations
     private Controls aiControls;
 
+    private MatchInfo matchInfo;
+
+    private Team teamLeft;
+    private Team teamRight;
+
     // All players list
     private List<Player> players;
 
@@ -83,6 +92,8 @@ public class TrainingScreen extends AbstractScreen {
 
     public TrainingScreen(Ploshchadka ploshchadka) {
         this.ploshchadka = ploshchadka;
+
+        gameState = GameState.PLAY;
 
         ball = new Ball(0, 0, 14, 14);
 
@@ -148,6 +159,20 @@ public class TrainingScreen extends AbstractScreen {
 
         goalKeepers.add(goalKeeper);
 
+        // Setup teams
+        teamLeft = new Team();
+        teamLeft.setTeamId(Constants.Team.TEST_LEFT);
+        teamLeft.getPlayers().add(humanPlayer);
+        teamLeft.getPlayers().add(teammatePlayer);
+
+        teamRight = new Team();
+        teamRight.setTeamId(Constants.Team.TEST_RIGHT);
+        teamRight.setGoalKeeper(goalKeeper);
+
+        matchInfo = new MatchInfo();
+        matchInfo.setTeamAtLeftSide(teamLeft.getTeamId());
+        matchInfo.setTeamAtRightSide(teamRight.getTeamId());
+
         // Prepare camera
         camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
         camera.setCameraCenter(0.0d, 0.0d);
@@ -177,17 +202,23 @@ public class TrainingScreen extends AbstractScreen {
 
         // Update players
         for (Player player : players) {
+            Team teammates = teamLeft.getTeamId() == player.getTeamId() ? teamLeft : teamRight;
+            Team opponents = teamLeft.getTeamId() == player.getTeamId() ? teamRight : teamLeft;
+
             if (player.isHumanControls()) {
-                charactersController.processPlayerState(player, humanControls, ball, null);
+                charactersController.processPlayerState(player, humanControls, ball, teammates);
             } else {
-                aiControls = charactersController.resolvePlayerControls(GameState.PLAY, aiControls, ball, player, players, goalKeepers);
-                charactersController.processPlayerState(player, aiControls, ball, null);
+                aiControls = charactersController.resolvePlayerControls(aiControls, gameState, matchInfo, ball, player, teammates, opponents);
+                charactersController.processPlayerState(player, aiControls, ball, teammates);
             }
         }
 
-        // Update goal keepers
+        // Update goalKeepers
         for (GoalKeeper goalKeeper : goalKeepers) {
-            aiControls = charactersController.resolveGoalKeeperControls(aiControls, ball, goalKeeper, players, goalKeepers);
+            Team teammates = teamLeft.getTeamId() == goalKeeper.getTeamId() ? teamLeft : teamRight;
+            Team opponents = teamLeft.getTeamId() == goalKeeper.getTeamId() ? teamRight : teamLeft;
+
+            aiControls = charactersController.resolveGoalKeeperControls(aiControls, gameState, matchInfo, ball, goalKeeper, teammates, opponents);
             updateGoalKeeper(goalKeeper, aiControls, ball);
         }
 

@@ -1,7 +1,7 @@
 package org.kdepo.games.ploshchadka.model.custom.screens;
 
 import org.kdepo.games.ploshchadka.model.base.screens.AbstractScreen;
-import org.kdepo.games.ploshchadka.model.custom.Ball;
+import org.kdepo.games.ploshchadka.model.custom.game.Ball;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;

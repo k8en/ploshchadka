@@ -4,14 +4,16 @@ import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationPlayMode;
 import org.kdepo.games.ploshchadka.model.base.geometry.Point3D;
 import org.kdepo.games.ploshchadka.model.base.utils.Console;
-import org.kdepo.games.ploshchadka.model.custom.Ball;
 import org.kdepo.games.ploshchadka.model.custom.Controls;
-import org.kdepo.games.ploshchadka.model.custom.FaceDirection;
-import org.kdepo.games.ploshchadka.model.custom.GameState;
 import org.kdepo.games.ploshchadka.model.custom.Impulse;
 import org.kdepo.games.ploshchadka.model.custom.characters.CharacterState;
-import org.kdepo.games.ploshchadka.model.custom.characters.GoalKeeper;
-import org.kdepo.games.ploshchadka.model.custom.characters.Player;
+import org.kdepo.games.ploshchadka.model.custom.characters.FaceDirection;
+import org.kdepo.games.ploshchadka.model.custom.game.Ball;
+import org.kdepo.games.ploshchadka.model.custom.game.GameState;
+import org.kdepo.games.ploshchadka.model.custom.game.GoalKeeper;
+import org.kdepo.games.ploshchadka.model.custom.game.MatchInfo;
+import org.kdepo.games.ploshchadka.model.custom.game.Player;
+import org.kdepo.games.ploshchadka.model.custom.game.Team;
 import org.kdepo.games.ploshchadka.utils.BallisticsUtils;
 import org.kdepo.games.ploshchadka.utils.MathUtils;
 
@@ -32,7 +34,7 @@ public class CharactersController {
 
     }
 
-    public Controls resolvePlayerControls(GameState gameState, Controls controls, Ball ball, Player player, List<Player> players, List<GoalKeeper> goalKeepers) {
+    public Controls resolvePlayerControls(Controls controls, GameState gameState, MatchInfo matchInfo, Ball ball, Player player, Team teammates, Team opponents) {
         // Reset controls
         controls = resetControls(controls);
 
@@ -48,7 +50,7 @@ public class CharactersController {
         return controls;
     }
 
-    public Controls resolveGoalKeeperControls(Controls controls, Ball ball, GoalKeeper goalKeeper, List<Player> players, List<GoalKeeper> goalKeepers) {
+    public Controls resolveGoalKeeperControls(Controls controls, GameState gameState, MatchInfo matchInfo, Ball ball, GoalKeeper goalKeeper, Team teammates, Team opponents) {
         // Reset controls
         controls = resetControls(controls);
 
@@ -68,7 +70,7 @@ public class CharactersController {
         return controls;
     }
 
-    public void processPlayerState(Player player, Controls controls, Ball ball, List<Player> teammates) {
+    public void processPlayerState(Player player, Controls controls, Ball ball, Team teammates) {
         if (CharacterState.STAND.equals(player.getCharacterState())) {
             if (controls.isButtonKick()) {
                 processPlayerStandWithKickIntent(player, ball);
@@ -370,10 +372,10 @@ public class CharactersController {
         }
     }
 
-    public void processPlayerStandWithPassIntent(Player player, Ball ball, List<Player> teammates) {
+    public void processPlayerStandWithPassIntent(Player player, Ball ball, Team teammates) {
     }
 
-    public void processPlayerRunWithPassIntent(Player player, Ball ball, List<Player> teammates) {
+    public void processPlayerRunWithPassIntent(Player player, Ball ball, Team teammates) {
     }
 
     public void processPlayerStandWithMoveUpIntent(Player player, Ball ball) {
