@@ -3,6 +3,7 @@ package org.kdepo.games.ploshchadka.model.custom.screens;
 import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.Ploshchadka;
 import org.kdepo.games.ploshchadka.ai.CharactersController;
+import org.kdepo.games.ploshchadka.fsm.PlayerStateMachine;
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.VirtualObject;
@@ -66,6 +67,7 @@ public class TrainingScreen extends AbstractScreen {
 
     // Game participants control
     CharactersController charactersController;
+    PlayerStateMachine playerStateMachine;
 
     // To collect controls from keyboard
     private Controls humanControls;
@@ -132,6 +134,7 @@ public class TrainingScreen extends AbstractScreen {
 
         // Initialize characters controller
         charactersController = CharactersController.getInstance();
+        playerStateMachine = PlayerStateMachine.getInstance();
 
         humanControls = new Controls();
         aiControls = new Controls();
@@ -206,10 +209,10 @@ public class TrainingScreen extends AbstractScreen {
             Team opponents = teamLeft.getTeamId() == player.getTeamId() ? teamRight : teamLeft;
 
             if (player.isHumanControls()) {
-                charactersController.processPlayerState(player, humanControls, ball, teammates);
+                playerStateMachine.process(player, humanControls, ball, teammates);
             } else {
                 aiControls = charactersController.resolvePlayerControls(aiControls, gameState, matchInfo, ball, player, teammates, opponents);
-                charactersController.processPlayerState(player, aiControls, ball, teammates);
+                playerStateMachine.process(player, aiControls, ball, teammates);
             }
         }
 

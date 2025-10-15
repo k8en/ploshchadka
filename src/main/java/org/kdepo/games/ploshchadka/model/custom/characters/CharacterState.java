@@ -17,6 +17,7 @@ public enum CharacterState {
     TACKLE,
 
     KICK,
-    POWER_KICK
+    POWER_KICK,
+    PASS
 
 }
