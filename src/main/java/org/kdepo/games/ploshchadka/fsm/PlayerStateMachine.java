@@ -3,6 +3,7 @@ package org.kdepo.games.ploshchadka.fsm;
 import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationPlayMode;
 import org.kdepo.games.ploshchadka.model.base.geometry.Point3D;
+import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
 import org.kdepo.games.ploshchadka.model.custom.Controls;
 import org.kdepo.games.ploshchadka.model.custom.Impulse;
 import org.kdepo.games.ploshchadka.model.custom.characters.CharacterState;
@@ -113,12 +114,15 @@ public class PlayerStateMachine {
             }
             case KICK: {
                 processPlayerKick(player);
-
                 break;
             }
             case POWER_KICK: {
                 processPlayerPowerKick(player, ball);
+                break;
+            }
 
+            case PASS: {
+                processPlayerPass(player);
                 break;
             }
         }
@@ -452,8 +456,41 @@ public class PlayerStateMachine {
 
                     // Initiate pass
                     if (nearestTeammate != null) {
+                        // Change to new animation according to face direction
+                        if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.KICK_RIGHT);
+                        } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.KICK_LEFT);
+                        } else {
+                            throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                        }
 
+                        // Setup animation play parameters
+                        player.getAnimationsController().setPlayMode(AnimationPlayMode.SINGLE);
+                        player.getAnimationsController().setPlayCompleted(false);
+                        player.getAnimationsController().resetCurrentFrameNumber();
+                        player.getAnimationsController().setTicksPassed(0);
 
+                        isAnimationChanged = true;
+
+                        // Hit the ball according to face direction
+                        Vector2D passVector2D = MathUtils.getVector2D(player.getCenterX(), player.getCenterY(), nearestTeammate.getCenterX(), nearestTeammate.getCenterY());
+                        Vector2D passVector2DNormalized = MathUtils.getVector2DNormalized(passVector2D);
+
+                        ball.getMovementVector().setX(passVector2DNormalized.getX());
+                        ball.getMovementVector().setY(passVector2DNormalized.getY());
+                        ball.getMovementVector().setZ(0);
+                        ball.setMovementSpeed(8);
+
+                        // Ball is not controlled anymore
+                        ball.setControlledBy(null);
+                        player.setControllingTheBall(false);
+
+                        // Reset kick readiness
+                        player.startKick();
+
+                        // Switch to new state
+                        player.setCharacterState(CharacterState.PASS);
                     }
                 }
             }
@@ -890,6 +927,89 @@ public class PlayerStateMachine {
     }
 
     public void processPlayerRunWithPassIntent(Player player, Ball ball, Team teammates) {
+        boolean isAnimationChanged = false;
+        if (player.isControllingTheBall()) {
+            if (ball.getControlledBy() != null && ball.getControlledBy().getId() == player.getId()) {
+                if (player.isReadyToKick()) {
+                    // Find the nearest teammate
+                    double nearestDistance = Double.MAX_VALUE;
+                    Player nearestTeammate = null;
+                    for (Player teammate : teammates.getPlayers()) {
+                        if (player.getId() == teammate.getId()) {
+                            // Skip itself
+                            continue;
+                        }
+                        double currentDistance = MathUtils.getDistance2D(player.getCenterX(), player.getCenterY(), teammate.getCenterX(), teammate.getCenterY());
+                        if (currentDistance < nearestDistance) {
+                            nearestDistance = currentDistance;
+                            nearestTeammate = teammate;
+                        }
+                    }
+
+                    // Initiate pass
+                    if (nearestTeammate != null) {
+                        // Change to new animation according to face direction
+                        if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.KICK_RIGHT);
+                        } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                            player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.KICK_LEFT);
+                        } else {
+                            throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+                        }
+
+                        // Setup animation play parameters
+                        player.getAnimationsController().setPlayMode(AnimationPlayMode.SINGLE);
+                        player.getAnimationsController().setPlayCompleted(false);
+                        player.getAnimationsController().resetCurrentFrameNumber();
+                        player.getAnimationsController().setTicksPassed(0);
+
+                        isAnimationChanged = true;
+
+                        // Hit the ball according to face direction
+                        Vector2D passVector2D = MathUtils.getVector2D(player.getCenterX(), player.getCenterY(), nearestTeammate.getCenterX(), nearestTeammate.getCenterY());
+                        Vector2D passVector2DNormalized = MathUtils.getVector2DNormalized(passVector2D);
+
+                        ball.getMovementVector().setX(passVector2DNormalized.getX());
+                        ball.getMovementVector().setY(passVector2DNormalized.getY());
+                        ball.getMovementVector().setZ(0);
+                        ball.setMovementSpeed(8);
+
+                        // Ball is not controlled anymore
+                        ball.setControlledBy(null);
+                        player.setControllingTheBall(false);
+
+                        // Reset kick readiness
+                        player.startKick();
+
+                        // Switch to new state
+                        player.setCharacterState(CharacterState.PASS);
+                    }
+                }
+            }
+
+        } else {
+            // Action without ball
+            boolean isTeammateControllingTheBall = false;
+            for (Player teammate : teammates.getPlayers()) {
+                if (teammate.isControllingTheBall()) {
+                    isTeammateControllingTheBall = true;
+                    break;
+                }
+            }
+
+            // Teammate is controlling the ball - to ask a pass
+            if (isTeammateControllingTheBall) {
+
+            }
+        }
+
+        if (!isAnimationChanged) {
+            // Update animation frame ticks
+            player.animate();
+        }
+
+        // Update internal parameters
+        player.update();
     }
     //endregion
 
@@ -974,6 +1094,37 @@ public class PlayerStateMachine {
                     player.startKick();
                 }
             }
+        }
+
+        // Update internal parameters
+        player.update();
+    }
+    //endregion
+
+    //region PASS
+    public void processPlayerPass(Player player) {
+        if (player.getAnimationsController().isPlayCompleted()) {
+            // Change to new animation according to face direction
+            if (FaceDirection.RIGHT.equals(player.getFaceDirection())) {
+                player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.STAND_RIGHT);
+            } else if (FaceDirection.LEFT.equals(player.getFaceDirection())) {
+                player.getAnimationsController().setCurrentAnimation(Constants.AnimationName.STAND_LEFT);
+            } else {
+                throw new RuntimeException("Unknown face direction: " + player.getFaceDirection());
+            }
+
+            // Setup animation play parameters
+            player.getAnimationsController().setPlayMode(AnimationPlayMode.LOOP);
+            player.getAnimationsController().setPlayCompleted(false);
+            player.getAnimationsController().resetCurrentFrameNumber();
+            player.getAnimationsController().setTicksPassed(0);
+
+            // Switch to new state
+            player.setCharacterState(CharacterState.STAND);
+
+        } else {
+            // Update animation frame ticks
+            player.animate();
         }
 
         // Update internal parameters
