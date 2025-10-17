@@ -10,9 +10,28 @@ import org.kdepo.games.ploshchadka.model.custom.characters.AbstractCharacter;
  */
 public abstract class GameParticipant extends AbstractCharacter {
 
+    /**
+     * Defines game participant role
+     */
+    protected GameRole gameRole;
+
+    /**
+     * Defines game participant team. In case of referee the value is 0
+     */
     protected int teamId;
 
+    /**
+     * Defines if game participant controlling the ball. In case of referee the value is false
+     */
     protected boolean isControllingTheBall;
+
+    public GameRole getGameRole() {
+        return gameRole;
+    }
+
+    public void setGameRole(GameRole gameRole) {
+        this.gameRole = gameRole;
+    }
 
     public int getTeamId() {
         return teamId;

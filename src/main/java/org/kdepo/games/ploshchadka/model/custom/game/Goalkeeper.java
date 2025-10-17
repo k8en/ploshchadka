@@ -10,9 +10,9 @@ import org.kdepo.games.ploshchadka.utils.FileUtils;
 
 import java.awt.image.BufferedImage;
 
-public class GoalKeeper extends GameParticipant {
+public class Goalkeeper extends GameParticipant {
 
-    public GoalKeeper(int id, String currentAnimationName, double centerX, double centerY, double centerZ) {
+    public Goalkeeper(int id, String currentAnimationName, double centerX, double centerY, double centerZ) {
         this.id = id;
 
         // Player state parameters

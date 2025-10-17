@@ -12,6 +12,9 @@ import java.awt.image.BufferedImage;
 
 public class Player extends GameParticipant {
 
+    /**
+     * Is controlled by human
+     */
     private boolean isHumanControls;
 
     private double runSpeed;
@@ -48,39 +51,6 @@ public class Player extends GameParticipant {
 
         // Is not controlling the ball by default
         isControllingTheBall = false;
-    }
-
-    public double getRunSpeed() {
-        return runSpeed;
-    }
-
-    public void setRunSpeed(double runSpeed) {
-        this.runSpeed = runSpeed;
-    }
-
-    public void animate() {
-        animationsController.animate();
-    }
-
-    public void update() {
-        if (kickReadiness < 100d) {
-            kickReadiness = kickReadiness + kickReadinessRestoreSpeed;
-            if (kickReadiness > 100d) {
-                kickReadiness = 100d;
-            }
-        }
-
-        if (freezeTicks != 0) {
-            freezeTicks--;
-        }
-    }
-
-    public boolean isReadyToKick() {
-        return kickReadiness == 100d;
-    }
-
-    public void startKick() {
-        kickReadiness = 0;
     }
 
     @Override
@@ -163,5 +133,38 @@ public class Player extends GameParticipant {
 
     public void setHumanControls(boolean humanControls) {
         isHumanControls = humanControls;
+    }
+
+    public double getRunSpeed() {
+        return runSpeed;
+    }
+
+    public void setRunSpeed(double runSpeed) {
+        this.runSpeed = runSpeed;
+    }
+
+    public void animate() {
+        animationsController.animate();
+    }
+
+    public void update() {
+        if (kickReadiness < 100d) {
+            kickReadiness = kickReadiness + kickReadinessRestoreSpeed;
+            if (kickReadiness > 100d) {
+                kickReadiness = 100d;
+            }
+        }
+
+        if (freezeTicks != 0) {
+            freezeTicks--;
+        }
+    }
+
+    public boolean isReadyToKick() {
+        return kickReadiness == 100d;
+    }
+
+    public void startKick() {
+        kickReadiness = 0;
     }
 }

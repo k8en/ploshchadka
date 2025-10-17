@@ -8,7 +8,7 @@ public class Team {
 
     private int teamId;
 
-    private GoalKeeper goalKeeper;
+    private Goalkeeper goalkeeper;
 
     private List<Player> players;
 
@@ -24,12 +24,12 @@ public class Team {
         this.teamId = teamId;
     }
 
-    public GoalKeeper getGoalKeeper() {
-        return goalKeeper;
+    public Goalkeeper getGoalkeeper() {
+        return goalkeeper;
     }
 
-    public void setGoalKeeper(GoalKeeper goalKeeper) {
-        this.goalKeeper = goalKeeper;
+    public void setGoalkeeper(Goalkeeper goalkeeper) {
+        this.goalkeeper = goalkeeper;
     }
 
     public List<Player> getPlayers() {
@@ -45,20 +45,20 @@ public class Team {
         if (o == null || getClass() != o.getClass()) return false;
         Team team = (Team) o;
         return teamId == team.teamId
-                && Objects.equals(goalKeeper, team.goalKeeper)
+                && Objects.equals(goalkeeper, team.goalkeeper)
                 && Objects.equals(players, team.players);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(teamId, goalKeeper, players);
+        return Objects.hash(teamId, goalkeeper, players);
     }
 
     @Override
     public String toString() {
         return "Team{" +
                 "teamId=" + teamId +
-                ", goalKeeper=" + goalKeeper +
+                ", goalkeeper=" + goalkeeper +
                 ", players=" + players +
                 '}';
     }
