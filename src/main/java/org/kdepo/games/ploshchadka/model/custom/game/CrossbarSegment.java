@@ -18,11 +18,11 @@ public class CrossbarSegment extends DrawableObject {
     public CrossbarSegment(double centerX, double centerY, int segmentNumber) {
         // Prepare image
         if (CrossbarSegment.SEGMENT_TOP == segmentNumber) {
-            image = FileUtils.loadImage("crossbar01.png");
+            image = FileUtils.loadImage("images/goal/crossbar_01.png");
         } else if (CrossbarSegment.SEGMENT_MIDDLE == segmentNumber) {
-            image = FileUtils.loadImage("crossbar02.png");
+            image = FileUtils.loadImage("images/goal/crossbar_02.png");
         } else if (CrossbarSegment.SEGMENT_BOTTOM == segmentNumber) {
-            image = FileUtils.loadImage("crossbar03.png");
+            image = FileUtils.loadImage("images/goal/crossbar_03.png");
         } else {
             throw new RuntimeException("Unknown crossbar segment number " + segmentNumber);
         }

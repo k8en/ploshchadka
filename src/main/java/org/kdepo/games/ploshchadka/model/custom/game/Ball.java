@@ -39,8 +39,8 @@ public class Ball extends DrawableObject {
 
     public Ball(double centerX, double centerY, double centerZ, double radius) {
         // Rendering parameters
-        BufferedImage ballSprites = FileUtils.loadImage("ball.png");
-        shadowImage = FileUtils.loadImage("shadow.png");
+        BufferedImage ballSprites = FileUtils.loadImage("animations/balls/ball.png");
+        shadowImage = FileUtils.loadImage("images/misc/shadow.png");
 
         int framesTotal = 6;
         int frameWidth = 28;

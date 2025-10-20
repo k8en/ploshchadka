@@ -46,10 +46,10 @@ public class Goalkeeper extends GameParticipant {
         animationsController = new AnimationsController();
 
         // Prepare frames images
-        BufferedImage imageFrame01 = FileUtils.loadImage("goalkeeper_frame_01.png");
-        BufferedImage imageFrame01m = FileUtils.loadImage("goalkeeper_frame_01m.png");
-        BufferedImage imageFrame02 = FileUtils.loadImage("goalkeeper_frame_02.png");
-        BufferedImage imageFrame02m = FileUtils.loadImage("goalkeeper_frame_01m.png");
+        BufferedImage imageFrame01 = FileUtils.loadImage("animations/goalkeeper/goalkeeper_frame_01.png");
+        BufferedImage imageFrame01m = FileUtils.loadImage("animations/goalkeeper/goalkeeper_frame_01m.png");
+        BufferedImage imageFrame02 = FileUtils.loadImage("animations/goalkeeper/goalkeeper_frame_02.png");
+        BufferedImage imageFrame02m = FileUtils.loadImage("animations/goalkeeper/goalkeeper_frame_01m.png");
 
         // Prepare animations
         AnimationFrame[] standRightFrames = new AnimationFrame[1];

@@ -13,7 +13,7 @@ public class Goalpost extends DrawableObject {
 
     public Goalpost(double centerX, double centerY) {
         // Prepare image
-        image = FileUtils.loadImage("goalpost.png");
+        image = FileUtils.loadImage("images/goal/goalpost.png");
 
         // Virtual position parameters
         this.centerX = centerX;

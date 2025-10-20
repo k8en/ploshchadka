@@ -1,14 +1,16 @@
 package org.kdepo.games.ploshchadka.model.custom.game;
 
 import org.kdepo.games.ploshchadka.Constants;
+import org.kdepo.games.ploshchadka.builders.PlayerSkinBuilder;
 import org.kdepo.games.ploshchadka.model.base.animation.Animation;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationFrame;
 import org.kdepo.games.ploshchadka.model.base.animation.AnimationsController;
 import org.kdepo.games.ploshchadka.model.custom.characters.CharacterState;
 import org.kdepo.games.ploshchadka.model.custom.characters.FaceDirection;
-import org.kdepo.games.ploshchadka.utils.FileUtils;
 
+import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Map;
 
 public class Player extends GameParticipant {
 
@@ -59,22 +61,48 @@ public class Player extends GameParticipant {
         animationsController = new AnimationsController();
 
         // Prepare frames images
-        BufferedImage imageFrame01 = FileUtils.loadImage("frame01.png");
-        BufferedImage imageFrame01m = FileUtils.loadImage("frame01m.png");
-        BufferedImage imageFrame02 = FileUtils.loadImage("frame02.png");
-        BufferedImage imageFrame02m = FileUtils.loadImage("frame02m.png");
-        BufferedImage imageFrame03 = FileUtils.loadImage("frame03.png");
-        BufferedImage imageFrame03m = FileUtils.loadImage("frame03m.png");
-        BufferedImage imageFrame04 = FileUtils.loadImage("frame04.png");
-        BufferedImage imageFrame04m = FileUtils.loadImage("frame04m.png");
-        BufferedImage imageFrame05 = FileUtils.loadImage("frame05.png");
-        BufferedImage imageFrame05m = FileUtils.loadImage("frame05m.png");
-        BufferedImage imageFrame06 = FileUtils.loadImage("frame06.png");
-        BufferedImage imageFrame06m = FileUtils.loadImage("frame06m.png");
-        BufferedImage imageFrame07 = FileUtils.loadImage("frame07.png");
-        BufferedImage imageFrame07m = FileUtils.loadImage("frame07m.png");
-        BufferedImage imageFrame08 = FileUtils.loadImage("frame08.png");
-        BufferedImage imageFrame08m = FileUtils.loadImage("frame08m.png");
+        PlayerSkin playerSkin = new PlayerSkin();
+        playerSkin.setHeadType("05");
+        playerSkin.setOutlineColor(new Color(0, 0, 0));
+        playerSkin.setSkinColor(new Color(254, 129, 112));
+        playerSkin.setClothingColor(new Color(255, 255, 255));
+
+        PlayerSkinBuilder builder = PlayerSkinBuilder.getInstance();
+        Map<String, BufferedImage> imagesMap = builder.buildImagesMap(playerSkin);
+
+        BufferedImage imageFrame01 = imagesMap.get("01");
+        BufferedImage imageFrame01m = imagesMap.get("01m");
+        BufferedImage imageFrame02 = imagesMap.get("02");
+        BufferedImage imageFrame02m = imagesMap.get("02m");
+        BufferedImage imageFrame03 = imagesMap.get("03");
+        BufferedImage imageFrame03m = imagesMap.get("03m");
+        BufferedImage imageFrame04 = imagesMap.get("04");
+        BufferedImage imageFrame04m = imagesMap.get("04m");
+        BufferedImage imageFrame05 = imagesMap.get("05");
+        BufferedImage imageFrame05m = imagesMap.get("05m");
+        BufferedImage imageFrame06 = imagesMap.get("06");
+        BufferedImage imageFrame06m = imagesMap.get("06m");
+        BufferedImage imageFrame07 = imagesMap.get("07");
+        BufferedImage imageFrame07m = imagesMap.get("07m");
+        BufferedImage imageFrame08 = imagesMap.get("08");
+        BufferedImage imageFrame08m = imagesMap.get("08m");
+
+//        BufferedImage imageFrame01 = FileUtils.loadImage("animations/player/frame01.png");
+//        BufferedImage imageFrame01m = FileUtils.loadImage("animations/player/frame01m.png");
+//        BufferedImage imageFrame02 = FileUtils.loadImage("animations/player/frame02.png");
+//        BufferedImage imageFrame02m = FileUtils.loadImage("animations/player/frame02m.png");
+//        BufferedImage imageFrame03 = FileUtils.loadImage("animations/player/frame03.png");
+//        BufferedImage imageFrame03m = FileUtils.loadImage("animations/player/frame03m.png");
+//        BufferedImage imageFrame04 = FileUtils.loadImage("animations/player/frame04.png");
+//        BufferedImage imageFrame04m = FileUtils.loadImage("animations/player/frame04m.png");
+//        BufferedImage imageFrame05 = FileUtils.loadImage("animations/player/frame05.png");
+//        BufferedImage imageFrame05m = FileUtils.loadImage("animations/player/frame05m.png");
+//        BufferedImage imageFrame06 = FileUtils.loadImage("animations/player/frame06.png");
+//        BufferedImage imageFrame06m = FileUtils.loadImage("animations/player/frame06m.png");
+//        BufferedImage imageFrame07 = FileUtils.loadImage("animations/player/frame07.png");
+//        BufferedImage imageFrame07m = FileUtils.loadImage("animations/player/frame07m.png");
+//        BufferedImage imageFrame08 = FileUtils.loadImage("animations/player/frame08.png");
+//        BufferedImage imageFrame08m = FileUtils.loadImage("animations/player/frame08m.png");
 
         // Prepare animations
         AnimationFrame[] standRightFrames = new AnimationFrame[1];
