@@ -13,6 +13,17 @@ public class PlayerSkin {
 
     private Color clothingColor;
 
+    public PlayerSkin() {
+
+    }
+
+    public PlayerSkin(String headType, Color outlineColor, Color skinColor, Color clothingColor) {
+        this.headType = headType;
+        this.outlineColor = outlineColor;
+        this.skinColor = skinColor;
+        this.clothingColor = clothingColor;
+    }
+
     public String getHeadType() {
         return headType;
     }

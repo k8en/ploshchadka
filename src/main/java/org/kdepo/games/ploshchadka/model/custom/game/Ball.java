@@ -143,21 +143,21 @@ public class Ball extends DrawableObject {
         );
 
         // Draw debug info
-        if (true) {
-            g.setColor(Color.MAGENTA);
-            g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
-
-            double screenOffsetCenterX = screenOffsetX + animationFrames[currentFrameNumber].getFrameImage().getWidth() / 2 - sphere.getRadius();
-            double screenOffsetCenterY = screenOffsetY + animationFrames[currentFrameNumber].getFrameImage().getHeight() + sphere.getZ() - sphere.getRadius() * 2;
-
-            g.setColor(Color.RED);
-            g.drawOval(
-                    (int) (screenOffsetCenterX),
-                    (int) (screenOffsetCenterY),
-                    (int) (sphere.getRadius() * 2),
-                    (int) (sphere.getRadius() * 2)
-            );
-        }
+//        if (true) {
+//            g.setColor(Color.MAGENTA);
+//            g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
+//
+//            double screenOffsetCenterX = screenOffsetX + animationFrames[currentFrameNumber].getFrameImage().getWidth() / 2 - sphere.getRadius();
+//            double screenOffsetCenterY = screenOffsetY + animationFrames[currentFrameNumber].getFrameImage().getHeight() + sphere.getZ() - sphere.getRadius() * 2;
+//
+//            g.setColor(Color.RED);
+//            g.drawOval(
+//                    (int) (screenOffsetCenterX),
+//                    (int) (screenOffsetCenterY),
+//                    (int) (sphere.getRadius() * 2),
+//                    (int) (sphere.getRadius() * 2)
+//            );
+//        }
     }
 
     public Sphere getSphere() {

@@ -7,7 +7,9 @@ import org.kdepo.games.ploshchadka.fsm.PlayerStateMachine;
 import org.kdepo.games.ploshchadka.model.base.DrawableObject;
 import org.kdepo.games.ploshchadka.model.base.VirtualCamera;
 import org.kdepo.games.ploshchadka.model.base.VirtualObject;
+import org.kdepo.games.ploshchadka.model.base.geometry.Line2D;
 import org.kdepo.games.ploshchadka.model.base.geometry.OrthogonalPolygon;
+import org.kdepo.games.ploshchadka.model.base.geometry.Point2D;
 import org.kdepo.games.ploshchadka.model.base.geometry.Point3D;
 import org.kdepo.games.ploshchadka.model.base.geometry.Vector2D;
 import org.kdepo.games.ploshchadka.model.base.geometry.Vector3D;
@@ -19,11 +21,14 @@ import org.kdepo.games.ploshchadka.model.custom.Ground;
 import org.kdepo.games.ploshchadka.model.custom.characters.FaceDirection;
 import org.kdepo.games.ploshchadka.model.custom.game.Ball;
 import org.kdepo.games.ploshchadka.model.custom.game.CrossbarSegment;
+import org.kdepo.games.ploshchadka.model.custom.game.GameFieldMarkup;
 import org.kdepo.games.ploshchadka.model.custom.game.GameState;
-import org.kdepo.games.ploshchadka.model.custom.game.GoalKeeper;
+import org.kdepo.games.ploshchadka.model.custom.game.Goalkeeper;
 import org.kdepo.games.ploshchadka.model.custom.game.Goalpost;
 import org.kdepo.games.ploshchadka.model.custom.game.MatchInfo;
 import org.kdepo.games.ploshchadka.model.custom.game.Player;
+import org.kdepo.games.ploshchadka.model.custom.game.PlayerParameters;
+import org.kdepo.games.ploshchadka.model.custom.game.PlayerSkin;
 import org.kdepo.games.ploshchadka.model.custom.game.Team;
 import org.kdepo.games.ploshchadka.utils.CollisionUtils;
 import org.kdepo.games.ploshchadka.utils.MathUtils;
@@ -49,6 +54,7 @@ public class TrainingScreen extends AbstractScreen {
     private final Ball ball;
 
     private final Ground ground;
+    private final GameFieldMarkup gameFieldMarkup;
 
     // Goalpost (right) rendering
     private final Goalpost goalpostRight1;
@@ -72,7 +78,7 @@ public class TrainingScreen extends AbstractScreen {
     // To collect controls from keyboard
     private Controls humanControls;
 
-    // To prepare controls based on algo calculations
+    // To prepare controls based on algorithmic calculations
     private Controls aiControls;
 
     private MatchInfo matchInfo;
@@ -84,7 +90,7 @@ public class TrainingScreen extends AbstractScreen {
     private List<Player> players;
 
     // All goalkeepers list
-    private List<GoalKeeper> goalKeepers;
+    private List<Goalkeeper> goalkeepers;
 
     // List of objects to sort and render
     private final List<DrawableObject> renderList;
@@ -100,6 +106,17 @@ public class TrainingScreen extends AbstractScreen {
         ball = new Ball(0, 0, 14, 14);
 
         ground = new Ground();
+        gameFieldMarkup = new GameFieldMarkup();
+        gameFieldMarkup.setFieldBounds(new VirtualRectangle(-928, -432, 1856, 864));
+        gameFieldMarkup.setKickOffPosition(new Point2D(0, 0));
+        gameFieldMarkup.setLeftSidePenaltyPosition(new Point2D(-736, 0));
+        gameFieldMarkup.setRightSidePenaltyPosition(new Point2D(736, 0));
+        gameFieldMarkup.setLeftSidePenaltyArea(new VirtualRectangle(-928, -208, 228, 416));
+        gameFieldMarkup.setRightSidePenaltyArea(new VirtualRectangle(700, -208, 228, 416));
+        gameFieldMarkup.setLeftSideGoalArea(new VirtualRectangle(-928, -112, 124, 224));
+        gameFieldMarkup.setRightSideGoalArea(new VirtualRectangle(804, -112, 124, 224));
+        gameFieldMarkup.setLeftSideGoalLine(new Line2D(new Point2D(-928, -76), new Point2D(-928, 76)));
+        gameFieldMarkup.setRightSideGoalLine(new Line2D(new Point2D(928, -76), new Point2D(928, 76)));
 
         // Prepare goalpost (right) rendering parameters
         goalpostRight1 = new Goalpost(965, -69 + 16);
@@ -120,6 +137,15 @@ public class TrainingScreen extends AbstractScreen {
         Point3D c2 = new Point3D(goalpostRight1.getX() + goalpostRight1.getWidth(), 60 + 16, 0);
         Point3D d2 = new Point3D(goalpostRight1.getX(), 60 + 16, 0);
 
+        System.out.println("a1 = " + a1);
+        System.out.println("b1 = " + b1);
+        System.out.println("c1 = " + c1);
+        System.out.println("d1 = " + d1);
+        System.out.println("a2 = " + a2);
+        System.out.println("b2 = " + b2);
+        System.out.println("c2 = " + c2);
+        System.out.println("d2 = " + d2);
+
         goalpostRight1Plane = new OrthogonalPolygon(a1, b1, c1, d1);
         goalpostRight2Plane = new OrthogonalPolygon(a2, b2, c2, d2);
         goalpostRightTopPlane = new OrthogonalPolygon(a1, b1, b2, a2);
@@ -139,42 +165,228 @@ public class TrainingScreen extends AbstractScreen {
         humanControls = new Controls();
         aiControls = new Controls();
 
-        // Prepare players
+        // Prepare players and goalkeepers
         players = new ArrayList<>();
-
-        // Add human-controlled player
-        Player humanPlayer = new Player(1, Constants.AnimationName.STAND_RIGHT, -50, 0, 0);
-        humanPlayer.setTeamId(Constants.Team.TEST_LEFT);
-        humanPlayer.setHumanControls(true);
-        players.add(humanPlayer);
-
-        // Add teammate for human-controlled player
-        Player teammatePlayer = new Player(3, Constants.AnimationName.STAND_RIGHT, 50, -50, 0);
-        teammatePlayer.setTeamId(Constants.Team.TEST_LEFT);
-        teammatePlayer.setHumanControls(false);
-        players.add(teammatePlayer);
-
-        // Prepare goal keepers
-        goalKeepers = new ArrayList<>();
-
-        GoalKeeper goalKeeper = new GoalKeeper(2, Constants.AnimationName.STAND_LEFT, 900, 0, 0);
-        goalKeeper.setTeamId(Constants.Team.TEST_RIGHT);
-
-        goalKeepers.add(goalKeeper);
+        goalkeepers = new ArrayList<>();
 
         // Setup teams
         teamLeft = new Team();
         teamLeft.setTeamId(Constants.Team.TEST_LEFT);
-        teamLeft.getPlayers().add(humanPlayer);
-        teamLeft.getPlayers().add(teammatePlayer);
+        teamLeft.setOutlineColor(new Color(0, 0, 0));
+        teamLeft.setClothingColor(new Color(255, 255, 255));
 
         teamRight = new Team();
         teamRight.setTeamId(Constants.Team.TEST_RIGHT);
-        teamRight.setGoalKeeper(goalKeeper);
+        teamRight.setOutlineColor(new Color(0, 0, 0));
+        teamRight.setClothingColor(new Color(156, 252, 240));
+
+        // Add human-controlled player
+        Player humanPlayer = new Player(
+                Constants.Character.KUNIO,
+                -48, 0, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "01", // Personal parameters
+                        teamLeft.getOutlineColor(),
+                        new Color(254, 129, 112), // Personal parameter
+                        new Color(255, 255, 255) // Team parameter
+                ),
+                FaceDirection.RIGHT // Match info parameter
+        );
+        humanPlayer.setTeamId(Constants.Team.TEST_LEFT); // Team parameter
+        humanPlayer.setHumanControls(true);
+        players.add(humanPlayer);
+
+        // Add teammate for human-controlled player
+        Player teammatePlayer1 = new Player(
+                Constants.Character.YORITSUNE,
+                -224, -208, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "02", // Personal parameters
+                        teamLeft.getOutlineColor(),
+                        new Color(254, 129, 112), // Personal parameter
+                        teamLeft.getClothingColor()
+                ),
+                FaceDirection.RIGHT // Match info parameter
+        );
+        teammatePlayer1.setTeamId(Constants.Team.TEST_LEFT);
+        teammatePlayer1.setHumanControls(false);
+        players.add(teammatePlayer1);
+
+        // Add teammate for human-controlled player
+        Player teammatePlayer2 = new Player(
+                Constants.Character.SAJI,
+                -224, 208, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "03", // Personal parameters
+                        teamLeft.getOutlineColor(),
+                        new Color(254, 129, 112), // Personal parameter
+                        teamLeft.getClothingColor()
+                ),
+                FaceDirection.RIGHT // Match info parameter
+        );
+        teammatePlayer2.setTeamId(Constants.Team.TEST_LEFT);
+        teammatePlayer2.setHumanControls(false);
+        players.add(teammatePlayer2);
+
+        // Add teammate for human-controlled player
+        Player teammatePlayer3 = new Player(
+                Constants.Character.HORIBATA,
+                -544, -272, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "04", // Personal parameters
+                        teamLeft.getOutlineColor(),
+                        new Color(254, 129, 112), // Personal parameter
+                        teamLeft.getClothingColor()
+                ),
+                FaceDirection.RIGHT // Match info parameter
+        );
+        teammatePlayer3.setTeamId(Constants.Team.TEST_LEFT);
+        teammatePlayer3.setHumanControls(false);
+        players.add(teammatePlayer3);
+
+        // Add teammate for human-controlled player
+        Player teammatePlayer4 = new Player(
+                Constants.Character.IWAKABE,
+                -544, 272, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "05", // Personal parameters
+                        teamLeft.getOutlineColor(),
+                        new Color(254, 129, 112), // Personal parameter
+                        teamLeft.getClothingColor()
+                ),
+                FaceDirection.RIGHT // Match info parameter
+        );
+        teammatePlayer4.setTeamId(Constants.Team.TEST_LEFT);
+        teammatePlayer4.setHumanControls(false);
+        players.add(teammatePlayer4);
+
+        // Add goalkeeper for human-controlled player
+        Goalkeeper goalKeeper1 = new Goalkeeper(
+                Constants.Character.GENEI,
+                Constants.AnimationName.STAND_RIGHT,
+                -864, 0, 0
+        );
+        goalKeeper1.setTeamId(Constants.Team.TEST_LEFT);
+        goalkeepers.add(goalKeeper1);
+
+        // Opponents team
+        // Add opponent player
+        Player opponentPlayer = new Player(
+                Constants.Character.UGAJIN,
+                48, 0, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "01", // Personal parameters
+                        teamRight.getOutlineColor(),
+                        new Color(252, 152, 56), // Personal parameter
+                        teamRight.getClothingColor()
+                ),
+                FaceDirection.LEFT // Match info parameter
+        );
+        opponentPlayer.setTeamId(Constants.Team.TEST_RIGHT); // Team parameter
+        opponentPlayer.setHumanControls(false);
+        players.add(opponentPlayer);
+
+        // Add opponent player
+        Player opponentPlayer1 = new Player(
+                Constants.Character.ONITAKE,
+                224, -208, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "02", // Personal parameters
+                        teamRight.getOutlineColor(),
+                        new Color(252, 152, 56), // Personal parameter
+                        teamRight.getClothingColor()
+                ),
+                FaceDirection.LEFT // Match info parameter
+        );
+        opponentPlayer1.setTeamId(Constants.Team.TEST_RIGHT);
+        opponentPlayer1.setHumanControls(false);
+        players.add(opponentPlayer1);
+
+        // Add opponent player
+        Player opponentPlayer2 = new Player(
+                Constants.Character.KUMON,
+                224, 208, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "03", // Personal parameters
+                        teamRight.getOutlineColor(),
+                        new Color(252, 152, 56), // Personal parameter
+                        teamRight.getClothingColor()
+                ),
+                FaceDirection.LEFT // Match info parameter
+        );
+        opponentPlayer2.setTeamId(Constants.Team.TEST_RIGHT);
+        opponentPlayer2.setHumanControls(false);
+        players.add(opponentPlayer2);
+
+        // Add opponent player
+        Player opponentPlayer3 = new Player(
+                Constants.Character.KAIZUKI,
+                544, -272, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "04", // Personal parameters
+                        teamRight.getOutlineColor(),
+                        new Color(252, 152, 56), // Personal parameter
+                        teamRight.getClothingColor()
+                ),
+                FaceDirection.LEFT // Match info parameter
+        );
+        opponentPlayer3.setTeamId(Constants.Team.TEST_RIGHT);
+        opponentPlayer3.setHumanControls(false);
+        players.add(opponentPlayer3);
+
+        // Add opponent player
+        Player opponentPlayer4 = new Player(
+                Constants.Character.TSUNEWO,
+                544, 272, 0, // Team strategy, position on a field
+                new PlayerParameters(), // Personal parameters
+                new PlayerSkin(
+                        "05", // Personal parameters
+                        teamRight.getOutlineColor(),
+                        new Color(252, 152, 56), // Personal parameter
+                        teamRight.getClothingColor()
+                ),
+                FaceDirection.LEFT // Match info parameter
+        );
+        opponentPlayer4.setTeamId(Constants.Team.TEST_RIGHT);
+        opponentPlayer4.setHumanControls(false);
+        players.add(opponentPlayer4);
+
+        // Add opponent goalkeeper
+        Goalkeeper goalKeeper2 = new Goalkeeper(
+                Constants.Character.CARLOS,
+                Constants.AnimationName.STAND_LEFT,
+                864, 0, 0
+        );
+        goalKeeper2.setTeamId(Constants.Team.TEST_RIGHT);
+        goalkeepers.add(goalKeeper2);
+
+        // Setup teams
+        teamLeft.getPlayers().add(humanPlayer);
+        teamLeft.getPlayers().add(teammatePlayer1);
+        teamLeft.getPlayers().add(teammatePlayer2);
+        teamLeft.getPlayers().add(teammatePlayer3);
+        teamLeft.getPlayers().add(teammatePlayer4);
+        teamLeft.setGoalkeeper(goalKeeper1);
+
+        teamRight.getPlayers().add(opponentPlayer);
+        teamRight.getPlayers().add(opponentPlayer1);
+        teamRight.getPlayers().add(opponentPlayer2);
+        teamRight.getPlayers().add(opponentPlayer3);
+        teamRight.getPlayers().add(opponentPlayer4);
+        teamRight.setGoalkeeper(goalKeeper2);
 
         matchInfo = new MatchInfo();
-        matchInfo.setTeamAtLeftSide(teamLeft.getTeamId());
-        matchInfo.setTeamAtRightSide(teamRight.getTeamId());
+        matchInfo.setTeamOnTheLeftSide(teamLeft.getTeamId());
+        matchInfo.setTeamOnTheRightSide(teamRight.getTeamId());
 
         // Prepare camera
         camera = new VirtualCamera(Constants.ScreenSize.WIDTH, Constants.ScreenSize.HEIGHT);
@@ -211,17 +423,17 @@ public class TrainingScreen extends AbstractScreen {
             if (player.isHumanControls()) {
                 playerStateMachine.process(player, humanControls, ball, teammates);
             } else {
-                aiControls = charactersController.resolvePlayerControls(aiControls, gameState, matchInfo, ball, player, teammates, opponents);
+                aiControls = charactersController.resolvePlayerControls(aiControls, gameState, gameFieldMarkup, matchInfo, ball, player, teammates, opponents);
                 playerStateMachine.process(player, aiControls, ball, teammates);
             }
         }
 
         // Update goalKeepers
-        for (GoalKeeper goalKeeper : goalKeepers) {
+        for (Goalkeeper goalKeeper : goalkeepers) {
             Team teammates = teamLeft.getTeamId() == goalKeeper.getTeamId() ? teamLeft : teamRight;
             Team opponents = teamLeft.getTeamId() == goalKeeper.getTeamId() ? teamRight : teamLeft;
 
-            aiControls = charactersController.resolveGoalKeeperControls(aiControls, gameState, matchInfo, ball, goalKeeper, teammates, opponents);
+            aiControls = charactersController.resolveGoalKeeperControls(aiControls, gameState, null, matchInfo, ball, goalKeeper, teammates, opponents);
             updateGoalKeeper(goalKeeper, aiControls, ball);
         }
 
@@ -232,7 +444,7 @@ public class TrainingScreen extends AbstractScreen {
         renderList.clear(); // TODO should we clear this every time?
 
         renderList.addAll(players);
-        renderList.addAll(goalKeepers);
+        renderList.addAll(goalkeepers);
 
         renderList.add(ball);
         renderList.add(goalpostRight1);
@@ -406,7 +618,7 @@ public class TrainingScreen extends AbstractScreen {
 
         } else {
             // No ball movement
-            Console.addMessage("Ball center(" + ball.getCenterX() + "," + ball.getCenterY() + "," + ball.getCenterZ() + ") - no movement");
+            //Console.addMessage("Ball center(" + ball.getCenterX() + "," + ball.getCenterY() + "," + ball.getCenterZ() + ") - no movement");
             return;
         }
 
@@ -496,10 +708,10 @@ public class TrainingScreen extends AbstractScreen {
             }
         }
 
-        Console.addMessage("Ball center(" + ball.getCenterX() + "," + ball.getCenterY() + "," + ball.getCenterZ() + ") Sphere center(" + ball.getSphere().getX() + "," + ball.getSphere().getY() + "," + ball.getSphere().getZ() + ")");
+        //Console.addMessage("Ball center(" + ball.getCenterX() + "," + ball.getCenterY() + "," + ball.getCenterZ() + ") Sphere center(" + ball.getSphere().getX() + "," + ball.getSphere().getY() + "," + ball.getSphere().getZ() + ")");
     }
 
-    private void updateGoalKeeper(GoalKeeper goalKeeper, Controls aiControls, Ball ball) {
+    private void updateGoalKeeper(Goalkeeper goalKeeper, Controls aiControls, Ball ball) {
     }
 
     public void updateCamera(VirtualCamera camera, VirtualRectangle cameraMovementBounds, VirtualObject target) {

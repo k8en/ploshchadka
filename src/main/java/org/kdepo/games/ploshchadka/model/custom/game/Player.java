@@ -8,7 +8,6 @@ import org.kdepo.games.ploshchadka.model.base.animation.AnimationsController;
 import org.kdepo.games.ploshchadka.model.custom.characters.CharacterState;
 import org.kdepo.games.ploshchadka.model.custom.characters.FaceDirection;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Map;
 
@@ -19,6 +18,16 @@ public class Player extends GameParticipant {
      */
     private boolean isHumanControls;
 
+    /**
+     * Player in-game parameters
+     */
+    private PlayerParameters playerParameters;
+
+    /**
+     * Player rendering parameters
+     */
+    private final PlayerSkin playerSkin;
+
     private double runSpeed;
     private double dashSpeed;
 
@@ -27,11 +36,12 @@ public class Player extends GameParticipant {
 
     private int freezeTicks;
 
-    public Player(int id, String currentAnimationName, double centerX, double centerY, double centerZ) {
+    public Player(int id, double centerX, double centerY, double centerZ, PlayerParameters playerParameters, PlayerSkin playerSkin, FaceDirection faceDirection) {
         this.id = id;
+        this.playerParameters = playerParameters;
+        this.playerSkin = playerSkin;
 
         // Player state parameters
-        faceDirection = FaceDirection.RIGHT;
         characterState = CharacterState.STAND;
         runSpeed = 1.8;
         dashSpeed = runSpeed * 1.6;
@@ -41,7 +51,17 @@ public class Player extends GameParticipant {
 
         freezeTicks = 0;
 
+        this.faceDirection = faceDirection;
+
         // Initialize animation controller, prepare images, frames and animations
+        String currentAnimationName;
+        if (FaceDirection.RIGHT.equals(faceDirection)) {
+            currentAnimationName = Constants.AnimationName.STAND_RIGHT;
+        } else if (FaceDirection.LEFT.equals(faceDirection)) {
+            currentAnimationName = Constants.AnimationName.STAND_LEFT;
+        } else {
+            throw new RuntimeException("Unknown face direction: " + faceDirection);
+        }
         initRenderingParameters(currentAnimationName);
 
         // Init object and sprite position
@@ -61,12 +81,6 @@ public class Player extends GameParticipant {
         animationsController = new AnimationsController();
 
         // Prepare frames images
-        PlayerSkin playerSkin = new PlayerSkin();
-        playerSkin.setHeadType("05");
-        playerSkin.setOutlineColor(new Color(0, 0, 0));
-        playerSkin.setSkinColor(new Color(254, 129, 112));
-        playerSkin.setClothingColor(new Color(255, 255, 255));
-
         PlayerSkinBuilder builder = PlayerSkinBuilder.getInstance();
         Map<String, BufferedImage> imagesMap = builder.buildImagesMap(playerSkin);
 
@@ -86,23 +100,6 @@ public class Player extends GameParticipant {
         BufferedImage imageFrame07m = imagesMap.get("07m");
         BufferedImage imageFrame08 = imagesMap.get("08");
         BufferedImage imageFrame08m = imagesMap.get("08m");
-
-//        BufferedImage imageFrame01 = FileUtils.loadImage("animations/player/frame01.png");
-//        BufferedImage imageFrame01m = FileUtils.loadImage("animations/player/frame01m.png");
-//        BufferedImage imageFrame02 = FileUtils.loadImage("animations/player/frame02.png");
-//        BufferedImage imageFrame02m = FileUtils.loadImage("animations/player/frame02m.png");
-//        BufferedImage imageFrame03 = FileUtils.loadImage("animations/player/frame03.png");
-//        BufferedImage imageFrame03m = FileUtils.loadImage("animations/player/frame03m.png");
-//        BufferedImage imageFrame04 = FileUtils.loadImage("animations/player/frame04.png");
-//        BufferedImage imageFrame04m = FileUtils.loadImage("animations/player/frame04m.png");
-//        BufferedImage imageFrame05 = FileUtils.loadImage("animations/player/frame05.png");
-//        BufferedImage imageFrame05m = FileUtils.loadImage("animations/player/frame05m.png");
-//        BufferedImage imageFrame06 = FileUtils.loadImage("animations/player/frame06.png");
-//        BufferedImage imageFrame06m = FileUtils.loadImage("animations/player/frame06m.png");
-//        BufferedImage imageFrame07 = FileUtils.loadImage("animations/player/frame07.png");
-//        BufferedImage imageFrame07m = FileUtils.loadImage("animations/player/frame07m.png");
-//        BufferedImage imageFrame08 = FileUtils.loadImage("animations/player/frame08.png");
-//        BufferedImage imageFrame08m = FileUtils.loadImage("animations/player/frame08m.png");
 
         // Prepare animations
         AnimationFrame[] standRightFrames = new AnimationFrame[1];

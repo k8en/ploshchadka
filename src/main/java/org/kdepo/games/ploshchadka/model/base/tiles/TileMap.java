@@ -127,7 +127,7 @@ public class TileMap {
     public void load(String mapName) {
         // Load used ids
         Integer[][] tileIds = FileUtils.readFileToArray("maps\\" + mapName);
-        System.out.println("Loaded tile ids" + tileIds[0].length + "x" + tileIds.length);
+        System.out.println("Loaded tile ids " + tileIds[0].length + "x" + tileIds.length);
 
         // Load tiles configurations
         String pathToImageMap = "tiles\\tiles.cfg";

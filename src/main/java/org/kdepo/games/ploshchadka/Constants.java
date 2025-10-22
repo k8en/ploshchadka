@@ -13,6 +13,22 @@ public class Constants {
         String POWER_KICK_LEFT = "POWER_KICK_LEFT";
     }
 
+    public interface Character {
+        // Team Japan
+        int KUNIO = 1;
+        int YORITSUNE = 2;
+        int SAJI = 3;
+        int HORIBATA = 4;
+        int IWAKABE = 5;
+        int GENEI = 6; // GK
+        int UGAJIN = 7;
+        int ONITAKE = 8;
+        int KUMON = 9;
+        int KAIZUKI = 10;
+        int TSUNEWO = 11;
+        int CARLOS = 12; // GK
+    }
+
     public interface ScreenSize {
         int WIDTH = 800;
         int HEIGHT = 600;

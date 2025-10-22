@@ -64,17 +64,17 @@ public abstract class AbstractCharacter extends DrawableObject {
                 null
         );
 
-        if (true) {
-            g.setColor(Color.MAGENTA);
-            g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
-
-            double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX);
-            double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY);
-
-            g.setColor(Color.RED);
-            g.drawOval((int) screenOffsetCenterX - characterRadius, (int) screenOffsetCenterY - characterRadius, characterRadius * 2, characterRadius * 2);
-            g.drawLine((int) screenOffsetCenterX, (int) screenOffsetCenterY - 64, (int) screenOffsetCenterX, (int) screenOffsetCenterY);
-        }
+//        if (true) {
+//            g.setColor(Color.MAGENTA);
+//            g.drawRect((int) screenOffsetX, (int) screenOffsetY, (int) this.width, (int) this.height);
+//
+//            double screenOffsetCenterX = camera.getScreenOffsetX(this.centerX);
+//            double screenOffsetCenterY = camera.getScreenOffsetY(this.centerY);
+//
+//            g.setColor(Color.RED);
+//            g.drawOval((int) screenOffsetCenterX - characterRadius, (int) screenOffsetCenterY - characterRadius, characterRadius * 2, characterRadius * 2);
+//            g.drawLine((int) screenOffsetCenterX, (int) screenOffsetCenterY - 64, (int) screenOffsetCenterX, (int) screenOffsetCenterY);
+//        }
     }
 
     public AnimationsController getAnimationsController() {
