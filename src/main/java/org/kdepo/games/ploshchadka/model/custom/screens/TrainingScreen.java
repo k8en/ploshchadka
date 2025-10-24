@@ -172,12 +172,12 @@ public class TrainingScreen extends AbstractScreen {
 
         // Setup teams
         teamLeft = new Team();
-        teamLeft.setTeamId(Constants.Team.TEST_LEFT);
+        teamLeft.setTeamId(Constants.Team.JAPAN);
         teamLeft.setOutlineColor(new Color(0, 0, 0));
         teamLeft.setClothingColor(new Color(255, 255, 255));
 
         teamRight = new Team();
-        teamRight.setTeamId(Constants.Team.TEST_RIGHT);
+        teamRight.setTeamId(Constants.Team.KOREA);
         teamRight.setOutlineColor(new Color(0, 0, 0));
         teamRight.setClothingColor(new Color(156, 252, 240));
 
@@ -247,8 +247,8 @@ public class TrainingScreen extends AbstractScreen {
 
         // Prepare team at the right
         Player opponent = playerBuilder.buildPlayer(
-                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.UGAJIN),
-                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.UGAJIN),
+                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.CHON_IL),
+                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.CHON_IL),
                 teamRight.getTeamId(),
                 new Point3D(48, 0, 0),
                 FaceDirection.LEFT // Match info parameter
@@ -256,8 +256,8 @@ public class TrainingScreen extends AbstractScreen {
         teamRight.getPlayers().add(opponent);
 
         Player opponent1 = playerBuilder.buildPlayer(
-                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.ONITAKE),
-                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.ONITAKE),
+                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.YONG_DOC),
+                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.YONG_DOC),
                 teamRight.getTeamId(),
                 new Point3D(224, -208, 0),
                 FaceDirection.LEFT // Match info parameter
@@ -265,8 +265,8 @@ public class TrainingScreen extends AbstractScreen {
         teamRight.getPlayers().add(opponent1);
 
         Player opponent2 = playerBuilder.buildPlayer(
-                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.KUMON),
-                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.KUMON),
+                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.MAN_SU),
+                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.MAN_SU),
                 teamRight.getTeamId(),
                 new Point3D(224, 208, 0),
                 FaceDirection.LEFT // Match info parameter
@@ -274,8 +274,8 @@ public class TrainingScreen extends AbstractScreen {
         teamRight.getPlayers().add(opponent2);
 
         Player opponent3 = playerBuilder.buildPlayer(
-                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.KAIZUKI),
-                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.KAIZUKI),
+                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.MING_HO),
+                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.MING_HO),
                 teamRight.getTeamId(),
                 new Point3D(544, -272, 0),
                 FaceDirection.LEFT // Match info parameter
@@ -283,8 +283,8 @@ public class TrainingScreen extends AbstractScreen {
         teamRight.getPlayers().add(opponent3);
 
         Player opponent4 = playerBuilder.buildPlayer(
-                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.TSUNEWO),
-                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.TSUNEWO),
+                playerParametersBuilder.getPredefinedPlayerParameters(Constants.Character.YONG_SU),
+                playerSkinBuilder.getPredefinedPlayerSkin(Constants.Character.YONG_SU),
                 teamRight.getTeamId(),
                 new Point3D(544, 272, 0),
                 FaceDirection.LEFT // Match info parameter
@@ -293,7 +293,7 @@ public class TrainingScreen extends AbstractScreen {
 
         // Add opponent goalkeeper
         Goalkeeper goalKeeperOpponent = new Goalkeeper(
-                Constants.Character.CARLOS,
+                Constants.Character.SUN_CHOL,
                 Constants.AnimationName.STAND_LEFT,
                 864, 0, 0
         );

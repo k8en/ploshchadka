@@ -154,6 +154,72 @@ public class PlayerParametersBuilder {
                         2.88d
                 )
         );
+
+        playerParametersMap.put(
+                Constants.Character.CHON_IL,
+                new PlayerParameters(
+                        Constants.Character.CHON_IL,
+                        "Chon-Il",
+                        GameRole.MIDFIELDER,
+                        1.8d,
+                        2.88d
+                )
+        );
+
+        playerParametersMap.put(
+                Constants.Character.YONG_DOC,
+                new PlayerParameters(
+                        Constants.Character.YONG_DOC,
+                        "Yong-Dok",
+                        GameRole.FORWARD,
+                        1.8d,
+                        2.88d
+                )
+        );
+
+        playerParametersMap.put(
+                Constants.Character.MAN_SU,
+                new PlayerParameters(
+                        Constants.Character.MAN_SU,
+                        "Man-Su",
+                        GameRole.FORWARD,
+                        1.8d,
+                        2.88d
+                )
+        );
+
+        playerParametersMap.put(
+                Constants.Character.MING_HO,
+                new PlayerParameters(
+                        Constants.Character.MING_HO,
+                        "Ming-Ho",
+                        GameRole.MIDFIELDER,
+                        1.8d,
+                        2.88d
+                )
+        );
+
+        playerParametersMap.put(
+                Constants.Character.YONG_SU,
+                new PlayerParameters(
+                        Constants.Character.YONG_SU,
+                        "Yong-Su",
+                        GameRole.DEFENDER,
+                        1.8d,
+                        2.88d
+                )
+        );
+
+        playerParametersMap.put(
+                Constants.Character.SUN_CHOL,
+                new PlayerParameters(
+                        Constants.Character.SUN_CHOL,
+                        "Sun-Chol",
+                        null,
+                        1.8d,
+                        2.88d
+                )
+        );
     }
 
     public PlayerParameters getPredefinedPlayerParameters(int playerId) {

@@ -27,6 +27,14 @@ public class Constants {
         int KAIZUKI = 10;
         int TSUNEWO = 11;
         int CARLOS = 12; // GK
+
+        // Team Korea
+        int CHON_IL = 13;
+        int YONG_DOC = 14;
+        int MAN_SU = 15;
+        int MING_HO = 16;
+        int YONG_SU = 17;
+        int SUN_CHOL = 18;
     }
 
     public interface ScreenSize {
@@ -35,9 +43,9 @@ public class Constants {
     }
 
     public interface Team {
-        int REFEREE = 1;
-        int TEST_LEFT = 2;
-        int TEST_RIGHT = 3;
+        int REFEREE = 0;
+        int JAPAN = 1;
+        int KOREA = 2;
     }
 
     private Constants() {
