@@ -1,5 +1,6 @@
 package org.kdepo.games.ploshchadka.builders;
 
+import org.kdepo.games.ploshchadka.Constants;
 import org.kdepo.games.ploshchadka.model.custom.game.PlayerSkin;
 import org.kdepo.games.ploshchadka.utils.FileUtils;
 
@@ -23,6 +24,8 @@ public class PlayerSkinBuilder {
 
     private final Map<String, BufferedImage> bodyFramesMap;
 
+    private final Map<Integer, PlayerSkin> playerSkinMap;
+
     public static PlayerSkinBuilder getInstance() {
         if (instance == null) {
             instance = new PlayerSkinBuilder();
@@ -40,6 +43,28 @@ public class PlayerSkinBuilder {
         skinColorTemplate = new Color(239, 228, 176);
         clothingColorTemplate = new Color(195, 195, 195);
         outlineColorTemplate = new Color(0, 0, 0);
+
+        playerSkinMap = new HashMap<>();
+        playerSkinMap.put(Constants.Character.KUNIO, new PlayerSkin("01", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.YORITSUNE, new PlayerSkin("02", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.SAJI, new PlayerSkin("03", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.HORIBATA, new PlayerSkin("04", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.IWAKABE, new PlayerSkin("05", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.GENEI, new PlayerSkin("06", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.UGAJIN, new PlayerSkin("07", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.ONITAKE, new PlayerSkin("08", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.KUMON, new PlayerSkin("09", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.KAIZUKI, new PlayerSkin("10", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.TSUNEWO, new PlayerSkin("11", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+        playerSkinMap.put(Constants.Character.CARLOS, new PlayerSkin("12", new Color(0, 0, 0), new Color(254, 129, 112), new Color(255, 255, 255)));
+    }
+
+    public PlayerSkin getPredefinedPlayerSkin(int playerId) {
+        PlayerSkin playerSkin = playerSkinMap.get(playerId);
+        if (playerSkin == null) {
+            throw new IllegalArgumentException("Unknown player id " + playerId);
+        }
+        return playerSkin;
     }
 
     public void loadHeadTypes() {
@@ -86,6 +111,48 @@ public class PlayerSkinBuilder {
         headTypesMap.put("06sm", FileUtils.loadImage("images/heads/head_type_06sm.png"));
         headTypesMap.put("06b", FileUtils.loadImage("images/heads/head_type_06b.png"));
         headTypesMap.put("06bm", FileUtils.loadImage("images/heads/head_type_06bm.png"));
+
+        headTypesMap.put("07", FileUtils.loadImage("images/heads/head_type_07.png"));
+        headTypesMap.put("07m", FileUtils.loadImage("images/heads/head_type_07m.png"));
+        headTypesMap.put("07s", FileUtils.loadImage("images/heads/head_type_07s.png"));
+        headTypesMap.put("07sm", FileUtils.loadImage("images/heads/head_type_07sm.png"));
+        headTypesMap.put("07b", FileUtils.loadImage("images/heads/head_type_07b.png"));
+        headTypesMap.put("07bm", FileUtils.loadImage("images/heads/head_type_07bm.png"));
+
+        headTypesMap.put("08", FileUtils.loadImage("images/heads/head_type_08.png"));
+        headTypesMap.put("08m", FileUtils.loadImage("images/heads/head_type_08m.png"));
+        headTypesMap.put("08s", FileUtils.loadImage("images/heads/head_type_08s.png"));
+        headTypesMap.put("08sm", FileUtils.loadImage("images/heads/head_type_08sm.png"));
+        headTypesMap.put("08b", FileUtils.loadImage("images/heads/head_type_08b.png"));
+        headTypesMap.put("08bm", FileUtils.loadImage("images/heads/head_type_08bm.png"));
+
+        headTypesMap.put("09", FileUtils.loadImage("images/heads/head_type_09.png"));
+        headTypesMap.put("09m", FileUtils.loadImage("images/heads/head_type_09m.png"));
+        headTypesMap.put("09s", FileUtils.loadImage("images/heads/head_type_09s.png"));
+        headTypesMap.put("09sm", FileUtils.loadImage("images/heads/head_type_09sm.png"));
+        headTypesMap.put("09b", FileUtils.loadImage("images/heads/head_type_09b.png"));
+        headTypesMap.put("09bm", FileUtils.loadImage("images/heads/head_type_09bm.png"));
+
+        headTypesMap.put("10", FileUtils.loadImage("images/heads/head_type_10.png"));
+        headTypesMap.put("10m", FileUtils.loadImage("images/heads/head_type_10m.png"));
+        headTypesMap.put("10s", FileUtils.loadImage("images/heads/head_type_10s.png"));
+        headTypesMap.put("10sm", FileUtils.loadImage("images/heads/head_type_10sm.png"));
+        headTypesMap.put("10b", FileUtils.loadImage("images/heads/head_type_10b.png"));
+        headTypesMap.put("10bm", FileUtils.loadImage("images/heads/head_type_10bm.png"));
+
+        headTypesMap.put("11", FileUtils.loadImage("images/heads/head_type_11.png"));
+        headTypesMap.put("11m", FileUtils.loadImage("images/heads/head_type_11m.png"));
+        headTypesMap.put("11s", FileUtils.loadImage("images/heads/head_type_11s.png"));
+        headTypesMap.put("11sm", FileUtils.loadImage("images/heads/head_type_11sm.png"));
+        headTypesMap.put("11b", FileUtils.loadImage("images/heads/head_type_11b.png"));
+        headTypesMap.put("11bm", FileUtils.loadImage("images/heads/head_type_11bm.png"));
+
+        headTypesMap.put("12", FileUtils.loadImage("images/heads/head_type_12.png"));
+        headTypesMap.put("12m", FileUtils.loadImage("images/heads/head_type_12m.png"));
+        headTypesMap.put("12s", FileUtils.loadImage("images/heads/head_type_12s.png"));
+        headTypesMap.put("12sm", FileUtils.loadImage("images/heads/head_type_12sm.png"));
+        headTypesMap.put("12b", FileUtils.loadImage("images/heads/head_type_12b.png"));
+        headTypesMap.put("12bm", FileUtils.loadImage("images/heads/head_type_12bm.png"));
     }
 
     public void loadBodyFrames() {
