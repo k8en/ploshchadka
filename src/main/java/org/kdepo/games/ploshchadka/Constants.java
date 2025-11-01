@@ -3,6 +3,8 @@ package org.kdepo.games.ploshchadka;
 public class Constants {
 
     public interface AnimationName {
+        String SIT_RIGHT = "SIT_RIGHT";
+        String SIT_LEFT = "SIT_LEFT";
         String STAND_RIGHT = "STAND_RIGHT";
         String STAND_LEFT = "STAND_LEFT";
         String RUN_RIGHT = "RUN_RIGHT";

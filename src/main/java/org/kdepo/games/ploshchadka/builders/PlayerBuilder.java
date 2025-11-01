@@ -92,6 +92,16 @@ public class PlayerBuilder {
         BufferedImage imageFrame08m = imagesMap.get("08m");
 
         // Prepare animations
+        AnimationFrame[] sitRightFrames = new AnimationFrame[1];
+        sitRightFrames[0] = new AnimationFrame(0, imageFrame08, 8);
+        Animation sitRightAnimation = new Animation(Constants.AnimationName.SIT_RIGHT, sitRightFrames, 0);
+        animationsController.addAnimation(sitRightAnimation);
+
+        AnimationFrame[] sitLeftFrames = new AnimationFrame[1];
+        sitLeftFrames[0] = new AnimationFrame(0, imageFrame08m, 8);
+        Animation sitLeftAnimation = new Animation(Constants.AnimationName.SIT_LEFT, sitLeftFrames, 0);
+        animationsController.addAnimation(sitLeftAnimation);
+
         AnimationFrame[] standRightFrames = new AnimationFrame[1];
         standRightFrames[0] = new AnimationFrame(0, imageFrame01, 999);
         Animation standRightAnimation = new Animation(Constants.AnimationName.STAND_RIGHT, standRightFrames, 0);
